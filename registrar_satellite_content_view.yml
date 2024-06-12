@@ -1,0 +1,29 @@
+---
+- name: Gestionando vistas de contenido en Satellite.
+  hosts: localhost
+  gather_facts: false
+  become: false
+  collections:
+    - redhat.satellite
+  tasks:
+    - name: Crear o actualizar content view {{ satellite_cv_name }}.
+      when:
+        - satellite_cv_action == "Crear" or
+          satellite_cv_action == "Modificar"
+      redhat.satellite.content_view:
+        name: "{{ satellite_cv_name }}"
+        organization: "{{ satellite_organization }}"
+        repositories: "{{ item['repositories'] | default(omit) }}"
+        composite: "{{ item['components'] | default(false) | ternary(true, false) }}"
+      loop: "{{ repositorios_enabled }}"
+      loop_control:
+        label: "Creando content view {{ satellite_cv_name }} con repositorios habilitados"
+
+    - name: Borrar content view {{ satellite_cv_name }}.
+      when:
+        - satellite_cv_action == "Borrar"
+      redhat.satellite.content_view:
+        name: "{{ satellite_cv_name }}"
+        organization: "{{ satellite_organization }}"
+        state: absent
+...

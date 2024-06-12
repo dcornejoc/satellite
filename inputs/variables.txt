@@ -1,0 +1,20 @@
+:doctype: book
+:confidentiality: Confidencial
+:toclevels: 6
+:nolang:
+:numbered:
+:chapter-label:
+:lang: es
+:icons: font
+:pdf-page-size: A4
+:pdf-style: redhat-theme.yml
+:pdf-stylesdir: .
+:revnumber: 1.0.0
+:imagesdir: images
+:ambiente: Desarrollo
+:toc-title: Tabla de contenidos
+:appendix-caption:
+:caution-caption: Precaución
+:figure-caption: Imagen
+:table-caption: Tabla
+:version-label: Versión

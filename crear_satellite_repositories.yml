@@ -1,0 +1,69 @@
+---
+- name: Gestion de repositorios en Satellite.
+  hosts: localhost
+  gather_facts: false
+  collections:
+    - redhat.satellite
+  tasks:
+    - name: Habilitando repositorios de arquitectura en organizacion {{ satellite_organization }}.
+      when:
+        - satellite_repository_action == "Habilitar"
+      redhat.satellite.repository_set:
+        organization: "{{ satellite_organization }}"
+        label: "{{ item['label'] }}"
+        repositories: "{{ item['repositories'] | default(omit) }}"
+        all_repositories: "{{ item['repositories'] is not defined }}"
+        state: enabled
+      loop:
+        - label: rhel-7-server-rpms
+          repositories:
+            - releasever: "7Server"
+              basearch: "x86_64"
+        - label: rhel-8-for-x86_64-baseos-rpms
+          repositories:
+            - releasever: "8"
+        - label: rhel-8-for-x86_64-appstream-rpms
+          repositories:
+            - releasever: "8"
+        - label: rhel-9-for-x86_64-baseos-rpms
+          repositories:
+            - releasever: "9"
+        - label: rhel-9-for-x86_64-appstream-rpms
+          repositories:
+            - releasever: "9"
+        - label: satellite-client-6-for-rhel-8-x86_64-rpms
+        - label: satellite-client-6-for-rhel-9-x86_64-rpms
+      loop_control:
+        label: "Habilitando repositorios {{ item['label'] }} en la organizacion {{ satellite_organization }}"
+
+    - name: Deshabilitando repositorios de arquitectura en organizacion {{ satellite_organization }}.
+      when:
+        - satellite_repository_action == "Deshabilitar"
+      redhat.satellite.repository_set:
+        organization: "{{ satellite_organization }}"
+        label: "{{ item['label'] }}"
+        repositories: "{{ item['repositories'] | default(omit) }}"
+        all_repositories: "{{ item['repositories'] is not defined }}"
+        state: disabled
+      loop:
+        - label: rhel-7-server-rpms
+          repositories:
+            - releasever: "7Server"
+              basearch: "x86_64"
+        - label: rhel-8-for-x86_64-baseos-rpms
+          repositories:
+            - releasever: "8"
+        - label: rhel-8-for-x86_64-appstream-rpms
+          repositories:
+            - releasever: "8"
+        - label: rhel-9-for-x86_64-baseos-rpms
+          repositories:
+            - releasever: "9"
+        - label: rhel-9-for-x86_64-appstream-rpms
+          repositories:
+            - releasever: "9"
+        - label: satellite-client-6-for-rhel-8-x86_64-rpms
+        - label: satellite-client-6-for-rhel-9-x86_64-rpms
+      loop_control:
+        label: "Deshabilitando repositorios {{ item['label'] }} en la organizacion {{ satellite_organization }}"
+...

@@ -1,0 +1,39 @@
+---
+- name: Revertir configuración de un host específico en Satellite
+  hosts: localhost
+  gather_facts: false
+  become: true
+  collections:
+    - redhat.satellite
+  tasks:
+    - name: Desuscribiendo host específico del Satellite.
+      delegate_to: "{{ specific_host }}"
+      community.general.redhat_subscription:
+        state: absent
+
+    - name: Desinstalar katello-ca-consumer en host específico.
+      delegate_to: "{{ specific_host }}"
+      ansible.builtin.dnf:
+        name: "katello-ca-consumer-{{ satellite_server_fqdn }}"
+        state: absent
+
+    - name: Eliminar configuración de sudo para el usuario satellite en host específico.
+      delegate_to: "{{ specific_host }}"
+      ansible.builtin.file:
+        path: /etc/sudoers.d/satellite
+        state: absent
+
+    - name: Eliminar la llave SSH pública del servidor Satellite del host específico.
+      delegate_to: "{{ specific_host }}"
+      ansible.builtin.lineinfile:
+        path: /home/satellite/.ssh/authorized_keys
+        state: absent
+        regexp: "^ssh-rsa.*{{ satellite_server_fqdn }}$"
+        backrefs: true
+
+    - name: Eliminar usuario satellite en host específico.
+      delegate_to: "{{ specific_host }}"
+      ansible.builtin.user:
+        name: satellite
+        state: absent
+        force: true

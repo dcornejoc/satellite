@@ -1,0 +1,14 @@
+---
+- name: Sincronizacion manual de repositorios en Satellite.
+  hosts: localhost
+  gather_facts: false
+  become: false
+  collections:
+    - redhat.satellite
+  tasks:
+    - name: Sincronizacion inmediata de repositorios o productos.
+      redhat.satellite.repository_sync:
+        organization: "{{ satellite_organization }}"
+        repository: "{{ repository_name | default(omit) }}"
+        product: "{{ repository_product_name }}"
+...

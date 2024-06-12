@@ -1,0 +1,142 @@
+---
+# tasks file for satellite-server
+- name: Anular suscripciones previas del servidor Satellite.
+  community.general.redhat_subscription:
+    state: absent
+
+- name: Suscribir Satellite Server usando RHSM.
+  community.general.redhat_subscription:
+    state: present
+    username: "{{ RHSM_username }}"
+    password: "{{ RHSM_password }}"
+#    pool_ids: "{{ RHSM_pool_id }}"
+    force_register: true
+
+- name: Deshabilitar todos los repositorios activos en RHSM.
+  community.general.rhsm_repository:
+    name: '*'
+    state: disabled
+
+- name: Habilitar repositorios requeridos desde RHSM.
+  community.general.rhsm_repository:
+    name:
+      - rhel-8-for-x86_64-baseos-rpms
+      - rhel-8-for-x86_64-appstream-rpms
+      - "satellite-{{ satellite_version }}-for-rhel-8-x86_64-rpms"
+      - "satellite-maintenance-{{ satellite_version }}-for-rhel-8-x86_64-rpms"
+    state: enabled
+
+- name: Habilitar modulo satellite:el8.
+  ansible.builtin.command:
+    cmd: "dnf module enable satellite:el8 -y"
+  changed_when: false
+
+- name: Actualizar todos los paquetes del sistema.
+  ansible.builtin.dnf:
+    name: "*"
+    state: latest # noqa package-latest
+  register: update_system
+  notify: Reiniciar servidor Red Hat Satellite si es requerido
+
+- name: Ejecutar handlers notificados.
+  ansible.builtin.meta: flush_handlers
+
+- name: Instalar paquete satellite en servidor Red Hat Satellite.
+  ansible.builtin.dnf:
+    name: satellite
+    state: present
+
+- name: Instalando paquetes chrony y sos en servidor Red Hat Satellite.
+  ansible.builtin.dnf:
+    name: "{{ satellite_server_pre_pkgs }}"
+    state: present
+
+- name: Iniciando servicio chronyd en servidor Red Hat Satellite.
+  ansible.builtin.service:
+    name: chronyd
+    state: started
+    enabled: true
+
+- name: Establecer zona horaria del servidor Red Hat Satellite.
+  community.general.timezone:
+    name: "{{ satellite_server_timezone }}"
+
+#- name: Creando directorio /root/satellite_cert si no existe.
+#  ansible.builtin.file:
+#    path: /root/satellite_cert
+#    state: directory
+#    mode: "0644"
+#
+#- name: Creando fichero de configuracion de SSL.
+#  ansible.builtin.template:
+#    src: openssl.cnf.j2
+#    dest: /root/satellite_cert/openssl.cnf
+#    mode: "0644"
+#
+#- name: Verificando integridad de los certificados SSL.
+#  ansible.builtin.command: >
+#    katello-certs-check \
+#    -c {{ satellite_cert_file }} \
+#    -k {{ satellite_cert_key_file }} \
+#    -b {{ ca_cert_bundle_file }}
+#  register: katello_certs_check
+#  failed_when: "'Validation succeeded' not in katello_certs_check['stdout']"
+#  changed_when: katello_certs_check['rc'] != 0
+#
+#- name: Mostrando integridad de los certificados.
+#  ansible.builtin.debug:
+#    var: katello_certs_check['stdout_lines']
+
+- name: Configuracion inicial de Red Hat Satellite server.
+  ansible.builtin.command: >
+    satellite-installer --scenario {{ satellite_server_installer_scenario }} \
+    --foreman-initial-admin-username {{ satellite_server_initial_user }} \
+    --foreman-initial-admin-password {{ satellite_server_initial_password }} \
+    --foreman-initial-organization "{{ satellite_organization | default('Default_Organization') }}" \
+    --certs-cname {{ satellite_server_cname }} \
+    --no-colors
+#    --certs-server-cert {{ satellite_cert_file }} \
+#    --certs-server-key {{ satellite_cert_key_file }} \
+#    --certs-server-ca-cert {{ ca_cert_bundle_file }} \    
+  register: satellite_install_result
+  changed_when: satellite_install_result['rc'] != 0
+
+- name: Mostrar resultado de la configuracion inicial de satellite.
+  ansible.builtin.debug:
+    var: satellite_install_result['stdout_lines']
+
+- name: Habilitar puertos requeridos en firewalld.
+  ansible.posix.firewalld:
+    port: "{{ item }}"
+    permanent: true
+    state: enabled
+    immediate: true
+  loop: "{{ satellite_server_fw_ports }}"
+  loop_control:
+    label: "Habilitando puerto {{ item }} en firewalld." 
+
+- name: Estableciendo permisos ACL para el usuario apache en /var/www/html/pub/
+  ansible.posix.acl:
+    path: /var/www/html/pub/
+    entity: apache
+    etype: user
+    permissions: r--
+    state: present
+    default: yes    
+
+- name: Buscar todos los archivos y directorios en /var/www/html/pub/
+  ansible.builtin.find:
+    paths: /var/www/html/pub/
+    recurse: yes
+    file_type: any
+  register: archivos_directorios
+
+- name: Aplicando permisos ACL para el usuario apache a todos los archivos y directorios encontrados
+  ansible.posix.acl:
+    path: "{{ item.path }}"
+    entity: apache
+    etype: user
+    permissions: r--
+    state: present
+  loop: "{{ archivos_directorios.files }}"  
+...

@@ -1,0 +1,62 @@
+---
+satellite_organization: "Banco Pichincha"
+repos:
+  - { Name: "Red Hat Directory Server 10 for Red Hat Enterprise Linux 7 Server (RPMs)", Product: "Red Hat Directory Server" }
+  - { Name: "Red Hat Directory Server 10 for Red Hat Enterprise Linux 7 Server (Source RPMs)", Product: "Red Hat Directory Server" }
+  - { Name: "Red Hat Ansible Automation Platform 2.0 Early Access for RHEL 8 x86_64 (RPMs)", Product: "Red Hat Ansible Automation Platform" }
+  - { Name: "Red Hat Ansible Automation Platform 2.1 for RHEL 8 x86_64 (RPMs)", Product: "Red Hat Ansible Automation Platform" }
+  - { Name: "Red Hat Ansible Automation Platform 2.4 for RHEL 8 x86_64 (RPMs)", Product: "Red Hat Ansible Automation Platform" }
+  - { Name: "Red Hat Automation Hub 4.2 for RHEL 8 x86_64 (RPMs)", Product: "Red Hat Ansible Automation Platform" }
+  - { Name: "Red Hat Automation Services Catalog 1 Tech Preview for RHEL 8 x86_64 (RPMs)", Product: "Red Hat Ansible Automation Platform" }
+  - { Name: "Red Hat CodeReady Linux Builder for RHEL 8 x86_64 (RPMs)", Product: "Red Hat CodeReady Linux Builder for x86_64" }
+  - { Name: "Red Hat CodeReady Linux Builder for RHEL 8 x86_64 (Source RPMs)", Product: "Red Hat CodeReady Linux Builder for x86_64" }
+  - { Name: "Red Hat Directory Server 11 for RHEL 8 x86_64 (RPMs)", Product: "Red Hat Directory Server" }
+  - { Name: "Red Hat Directory Server 11 for RHEL 8 x86_64 (Source RPMs)", Product: "Red Hat Directory Server" }
+  - { Name: "Red Hat OpenShift Container Platform 3.11 (RPMs)", Product: "Red Hat OpenShift Container Platform" }
+  - { Name: "Red Hat OpenShift Container Platform 3.11 (Source RPMs)", Product: "Red Hat OpenShift Container Platform" }
+  - { Name: "Red Hat OpenShift Container Platform 4.11 for RHEL 8 x86_64 (RPMs)", Product: "Red Hat OpenShift Container Platform" }
+  - { Name: "Red Hat OpenShift Container Platform 4.11 for RHEL 8 x86_64 (Source RPMs)", Product: "Red Hat OpenShift Container Platform" }
+  - { Name: "Red Hat Software Collections RPMs for Red Hat Enterprise Linux 7 Server", Product: "Red Hat Software Collections (for RHEL Server)" }
+  - { Name: "Red Hat Software Collections Source RPMs for Red Hat Enterprise Linux 7 Server", Product: "Red Hat Software Collections (for RHEL Server)" }
+  - { Name: "Red Hat Software Collections RPMs for Red Hat Enterprise Linux 6 Server", Product: "Red Hat Software Collections (for RHEL Server)" }
+  - { Name: "Red Hat Software Collections Source RPMs for Red Hat Enterprise Linux 6 Server", Product: "Red Hat Software Collections (for RHEL Server)" }
+  - { Name: "Red Hat Enterprise Linux 8 for x86_64 - AppStream (Debug RPMs)", Product: "Red Hat Enterprise Linux for x86_64" }
+  - { Name: "Red Hat Enterprise Linux 8 for x86_64 - AppStream (Kickstart)", Product: "Red Hat Enterprise Linux for x86_64" }
+  - { Name: "Red Hat Enterprise Linux 8 for x86_64 - AppStream (RPMs)", Product: "Red Hat Enterprise Linux for x86_64" }
+  - { Name: "Red Hat Enterprise Linux 8 for x86_64 - AppStream (Source RPMs)", Product: "Red Hat Enterprise Linux for x86_64" }
+  - { Name: "Red Hat Enterprise Linux 8 for x86_64 - BaseOS (Debug RPMs)", Product: "Red Hat Enterprise Linux for x86_64" }
+  - { Name: "Red Hat Enterprise Linux 8 for x86_64 - BaseOS (Kickstart)", Product: "Red Hat Enterprise Linux for x86_64" }
+  - { Name: "Red Hat Enterprise Linux 8 for x86_64 - BaseOS (RPMs)", Product: "Red Hat Enterprise Linux for x86_64" }
+  - { Name: "Red Hat Enterprise Linux 8 for x86_64 - BaseOS (Source RPMs)", Product: "Red Hat Enterprise Linux for x86_64" }
+  - { Name: "Red Hat Enterprise Linux 8 for x86_64 - Supplementary (Debug RPMs)", Product: "Red Hat Enterprise Linux for x86_64" }
+  - { Name: "Red Hat Enterprise Linux 8 for x86_64 - Supplementary (RPMs)", Product: "Red Hat Enterprise Linux for x86_64" }
+  - { Name: "Red Hat Enterprise Linux 8 for x86_64 - Supplementary (Source RPMs)", Product: "Red Hat Enterprise Linux for x86_64" }
+  - { Name: "Red Hat Enterprise Linux 9 for x86_64 - AppStream (Debug RPMs)", Product: "Red Hat Enterprise Linux for x86_64" }
+  - { Name: "Red Hat Enterprise Linux 9 for x86_64 - AppStream (Kickstart)", Product: "Red Hat Enterprise Linux for x86_64" }
+  - { Name: "Red Hat Enterprise Linux 9 for x86_64 - AppStream (RPMs)", Product: "Red Hat Enterprise Linux for x86_64" }
+  - { Name: "Red Hat Enterprise Linux 9 for x86_64 - AppStream (Source RPMs)", Product: "Red Hat Enterprise Linux for x86_64" }
+  - { Name: "Red Hat Enterprise Linux 9 for x86_64 - BaseOS (Debug RPMs)", Product: "Red Hat Enterprise Linux for x86_64" }
+  - { Name: "Red Hat Enterprise Linux 9 for x86_64 - BaseOS (Kickstart)", Product: "Red Hat Enterprise Linux for x86_64" }
+  - { Name: "Red Hat Enterprise Linux 9 for x86_64 - BaseOS (RPMs)", Product: "Red Hat Enterprise Linux for x86_64" }
+  - { Name: "Red Hat Enterprise Linux 9 for x86_64 - BaseOS (Source RPMs)", Product: "Red Hat Enterprise Linux for x86_64" }
+  - { Name: "Red Hat Enterprise Linux 9 for x86_64 - Supplementary (Debug RPMs)", Product: "Red Hat Enterprise Linux for x86_64" }
+  - { Name: "Red Hat Enterprise Linux 9 for x86_64 - Supplementary (RPMs)", Product: "Red Hat Enterprise Linux for x86_64" }
+  - { Name: "Red Hat Enterprise Linux 9 for x86_64 - Supplementary (Source RPMs)", Product: "Red Hat Enterprise Linux for x86_64" }
+  - { Name: "Red Hat Satellite Client 6 for RHEL 8 x86_64 (Debug RPMs)", Product: "Red Hat Enterprise Linux for x86_64" }
+  - { Name: "Red Hat Satellite Client 6 for RHEL 8 x86_64 (RPMs)", Product: "Red Hat Enterprise Linux for x86_64" }
+  - { Name: "Red Hat Satellite Client 6 for RHEL 8 x86_64 (Source RPMs)", Product: "Red Hat Enterprise Linux for x86_64" }
+  - { Name: "Red Hat Satellite Client 6 for RHEL 9 x86_64 (Debug RPMs)", Product: "Red Hat Enterprise Linux for x86_64" }
+  - { Name: "Red Hat Satellite Client 6 for RHEL 9 x86_64 (RPMs)", Product: "Red Hat Enterprise Linux for x86_64" }
+  - { Name: "Red Hat Satellite Client 6 for RHEL 9 x86_64 (Source RPMs)", Product: "Red Hat Enterprise Linux for x86_64" }
+  - { Name: "Red Hat Satellite Maintenance 6.15 for RHEL 8 x86_64 (Debug RPMs)", Product: "Red Hat Enterprise Linux for x86_64" }
+  - { Name: "Red Hat Satellite Maintenance 6.15 for RHEL 8 x86_64 (RPMs)", Product: "Red Hat Enterprise Linux for x86_64" }
+  - { Name: "Red Hat Satellite Maintenance 6.15 for RHEL 8 x86_64 (Source RPMs)", Product: "Red Hat Enterprise Linux for x86_64" }
+  - { Name: "Red Hat Satellite Maintenance 6 Beta for RHEL 8 x86_64 (Debug RPMs)", Product: "Red Hat Enterprise Linux for x86_64" }
+  - { Name: "Red Hat Satellite Maintenance 6 Beta for RHEL 8 x86_64 (RPMs)", Product: "Red Hat Enterprise Linux for x86_64" }
+  - { Name: "Red Hat Satellite Maintenance 6 Beta for RHEL 8 x86_64 (Source RPMs)", Product: "Red Hat Enterprise Linux for x86_64" }
+  - { Name: "Red Hat Satellite Utils 6.15 for RHEL 8 x86_64 (Debug RPMs)", Product: "Red Hat Enterprise Linux for x86_64" } 
+  - { Name: "Red Hat Satellite Utils 6.15 for RHEL 8 x86_64 (RPMs)", Product: "Red Hat Enterprise Linux for x86_64" }
+  - { Name: "Red Hat Satellite Utils 6.15 for RHEL 8 x86_64 (Source RPMs)", Product: "Red Hat Enterprise Linux for x86_64" } 
+  - { Name: "Red Hat Satellite Utils 6 Beta for RHEL 8 x86_64 (Debug RPMs)", Product: "Red Hat Enterprise Linux for x86_64" } 
+  - { Name: "Red Hat Satellite Utils 6 Beta for RHEL 8 x86_64 (RPMs)", Product: "Red Hat Enterprise Linux for x86_64" }
+  - { Name: "Red Hat Satellite Utils 6 Beta for RHEL 8 x86_64 (Source RPMs)", Product: "Red Hat Enterprise Linux for x86_64" }

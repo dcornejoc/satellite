@@ -1,0 +1,9 @@
+---
+satellite_organization: "Banco Pichincha"
+lifecycle_environment_complete:
+  - lifecycle_environment_name: "DEV"
+    lifecycle_environment_prior: "Library"
+  - lifecycle_environment_name: "TEST"
+    lifecycle_environment_prior: "DEV"
+  - lifecycle_environment_name: "PROD"
+    lifecycle_environment_prior: "TEST"

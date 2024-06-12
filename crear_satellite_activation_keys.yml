@@ -1,0 +1,28 @@
+---
+- name: Gestion de llaves de activacion.
+  hosts: localhost
+  gather_facts: false
+  become: false
+  collections:
+    - redhat.satellite
+  tasks:
+    - name: Crear activation key en Satellite.
+      when:
+        - satellite_activation_key_action == "crear" or
+          satellite_activation_key_action == "actualizar"
+      redhat.satellite.activation_key:
+        name: "{{ satellite_activation_key_name }}"
+        organization: "{{ satellite_organization }}"
+        lifecycle_environment: "{{ satellite_lifecycle_environment }}"
+        content_view: "{{ satellite_contentview_name }}"
+        host_collections: "{{ satellite_host_collections | default(omit) }}"
+        auto_attach: "{{ satellite_auto_attach_key }}"
+        release_version: "{{ satellite_release_version | default(omit) }}"
+        service_level: "{{ satellite_service_level | default(omit) }}"
+        unlimited_hosts: "{{ satellite_unlimited_hosts | default(true) }}"
+        max_hosts: "{{ satellite_max_hosts | default(omit) }}"
+        content_overrides: "{{ item['content_overrides'] }}"
+      loop: "{{ satellite_override_content }}"
+      loop_control:
+        label: "Creando activation keys"
+...

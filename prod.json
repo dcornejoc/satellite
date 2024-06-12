@@ -1,0 +1,1585 @@
+{
+	"project_name": "Despliegue Red Hat Satellite",
+	"responsible_area": "Torre Unix",
+    "repository_URL": "https://BancoPichinchaEC@dev.azure.com/BancoPichinchaEC/BP-Ansible-Plataformas/_git/ans-aut-arqPlataf-satellite",
+	"inventories": [
+		{
+			"name_of_inventory": "PROD-Servidores Satellite",
+			"type": "repo",
+			"path": "inventories/aap_prod/prod_platforms/inventory"
+		},
+        {
+			"name_of_inventory": "DEV-Servidores Satellite",
+			"type": "repo",
+			"path": "inventories/aap_prod/dev_platforms/inventory"
+		}
+       ],
+	"job_templates": [
+		{
+			"name": "PROD-1.1-Instalar y Configurar Satellite Server",
+			"description": "Playbook para la instalación y configuración inicial de Red Hat Satellite",
+			"job_type": "run",
+			"inventory_name": "PROD-Servidores Satellite",
+			"playbook_file": "instalar_satellite_prod.yml",
+			"execution_groups": [
+				"ArqPlataformas"
+			],
+			"execution_environment":"EE-unix-satellite",
+			"extra_vars": {},
+			"ask_job_type_on_launch":false,
+			"ask_verbosity_on_launch":true,
+			"ask_limit_on_launch":false,
+			"forks":5,
+			"is_part_of_workflow":false,
+			"survey_enabled": true,
+			"survey_spec": {
+				"name": "",
+				"description": "",
+				"spec": [
+                   {
+                        "question_name": "Ingresar el nombre del usuario de RHSM",
+                        "question_description": "Usuario para el portal de Red Hat",
+                        "required": true,
+                        "type": "text",
+                        "variable": "RHSM_username",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": "",
+                        "new_question": true
+                    },
+					{
+                        "question_name": "Ingresar el password del usuario de RHSM",
+                        "question_description": "Contraseña para el Portal de Red Hat",
+                        "required": true,
+                        "type": "password",
+                        "variable": "RHSM_password",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": "",
+                        "new_question": true
+                    },
+					{
+                        "question_name": "Ingresar la versión de Red Hat Satellite que desea instalar",
+                        "question_description": "Versión de producto",
+                        "required": true,
+                        "type": "text",
+                        "variable": "satellite_version",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "6.15",
+                        "choices": "",
+                        "new_question": true
+                    },
+					{
+                        "question_name": "Ingresar la zona horaria del servidor Satellite",
+                        "question_description": "Zona horaria para el servidor",
+                        "required": true,
+                        "type": "text",
+                        "variable": "satellite_server_timezone",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "America/Guayaquil",
+                        "choices": "",
+                        "new_question": true
+                    },
+					{
+                        "question_name": "Ingresar el nombre del usuario inicial de Satellite",
+                        "question_description": "Usuario admin inicial para Satellite",
+                        "required": true,
+                        "type": "text",
+                        "variable": "satellite_server_initial_user",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "admin",
+                        "choices": "",
+                        "new_question": true
+                    },
+					{
+                        "question_name": "Ingresar el password del usuario inicial de Satellite",
+                        "question_description": "Contraseña para usuario admin inicial para Satellite",
+                        "required": true,
+                        "type": "password",
+                        "variable": "satellite_server_initial_password",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": "",
+                        "new_question": true
+                    },
+					{
+                        "question_name": "Ingresar el nombre(s) de la(s) ubicación(es)",
+                        "question_description": "Ubicación del servidor",
+                        "required": true,
+                        "type": "textarea",
+                        "variable": "satellite_location_name",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": "",
+                        "new_question": true
+                    },
+					{
+                        "question_name": "Ingresar el UUID del manifiesto",
+                        "question_description": "UUID del manifiesto se puede obtener del Portal de Red Hat",
+                        "required": true,
+                        "type": "text",
+                        "variable": "satellite_manifest_uuid",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": "",
+                        "new_question": true
+                    },
+					{
+                        "question_name": "Ingresar el nombre del plan de sincronización ",
+                        "question_description": "Nombre para el plan de sincronización de productos",
+                        "required": true,
+                        "type": "text",
+                        "variable": "satellite_sync_name",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": "",
+                        "new_question": true
+                    },
+					{
+                        "question_name": "Ingresar el intervalo deseado para el plan de sincronización ",
+                        "question_description": "Intervalo para el plan de sincronización",
+                        "required": true,
+                        "type": "multiplechoice",
+                        "variable": "satellite_sync_interval",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": [
+                            "daily",
+							"weekly",
+							"hourly",
+							"custom cron"
+                        ],
+                        "new_question": true
+                    },
+					{
+                        "question_name": "Si escogió custom cron, escribir en formato cron el intervalo",
+                        "question_description": "Especificar intervalo para sincronización",
+                        "required": false,
+                        "type": "text",
+                        "variable": "satellite_sync_cron",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": "",
+                        "new_question": true
+                    },
+					{
+                        "question_name": "Ingresar el CNAME para el servidor de Satellite",
+                        "question_description": "Especificar el CNAME",
+                        "required": true,
+                        "type": "text",
+                        "variable": "satellite_server_cname",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "satellite.uio.bpichincha.com",
+                        "choices": "",
+                        "new_question": true
+                    }
+                ]
+            }
+		},
+        {
+			"name": "DEV-1.2-Instalar Satellite Capsulas EnP",
+			"description": "Playbook para la instalación y configuración inicial de Red Hat Satellite Capsula EnP",
+			"job_type": "run",
+			"inventory_name": "DEV-Servidores Satellite",
+			"playbook_file": "instalar_capsulas_enp.yml",
+			"execution_groups": [
+				"ArqPlataformas"
+			],
+			"execution_environment":"EE-unix-satellite",
+			"extra_vars": {},
+			"ask_job_type_on_launch":false,
+			"ask_verbosity_on_launch":true,
+			"ask_limit_on_launch":false,
+			"forks":5,
+			"is_part_of_workflow":false,
+			"survey_enabled": true,
+			"survey_spec": {
+				"name": "",
+				"description": "",
+				"spec": [
+				    {
+                        "question_name": "Ingresar el CNAME de Satellite",
+                        "question_description": "Especificar el CNAME",
+                        "required": true,
+                        "type": "text",
+                        "variable": "satellite_server_fqdn",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "satellite.uio.bpichincha.com",
+                        "choices": "",
+                        "new_question": true
+                    },
+				    {
+                        "question_name": "Ingresar activation key para las capsulas",
+                        "question_description": "Inserte activation key",
+                        "required": true,
+                        "type": "text",
+                        "variable": "satellite_capsule_activation_key",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": "",
+                        "new_question": false
+                    },
+                    {
+                        "question_name": "Ingresar el organization ID",
+                        "question_description": "Ingresar el id de la organización",
+                        "required": true,
+                        "type": "text",
+                        "variable": "satellite_capsule_org_id",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "Banco Pichincha",
+                        "choices": "",
+                        "new_question": true
+                    },
+					{
+                        "question_name": "Ingresar la versión de Red Hat Satellite",
+                        "question_description": "Versión de producto",
+                        "required": true,
+                        "type": "text",
+                        "variable": "satellite_version",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "6.15",
+                        "choices": "",
+                        "new_question": true
+                    },
+					{
+                        "question_name": "Ingresar la zona horaria",
+                        "question_description": "Zona horaria para el seervidor",
+                        "required": true,
+                        "type": "text",
+                        "variable": "satellite_capsule_timezone",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "America/Guayaquil",
+                        "choices": "",
+                        "new_question": true
+                    },
+					{
+                        "question_name": "Ingresar la location de la capsula",
+                        "question_description": "Ubicación de la capsula",
+                        "required": true,
+                        "type": "text",
+                        "variable": "capsule_location",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": "",
+                        "new_question": true
+                    }
+                ]
+            }
+		},
+        {
+			"name": "PROD-1.3-Instalar Satellite Capsulas Prod",
+			"description": "Playbook para la instalación y configuración inicial de Red Hat Satellite Capsula Prod",
+			"job_type": "run",
+			"inventory_name": "PROD-Servidores Satellite",
+			"playbook_file": "instalar_capsulas_prod.yml",
+			"execution_groups": [
+				"ArqPlataformas"
+			],
+			"execution_environment":"EE-unix-satellite",
+			"extra_vars": {},
+			"ask_job_type_on_launch":false,
+			"ask_verbosity_on_launch":true,
+			"ask_limit_on_launch":false,
+			"forks":5,
+			"is_part_of_workflow":false,
+			"survey_enabled": true,
+			"survey_spec": {
+				"name": "",
+				"description": "",
+				"spec": [
+				    {
+                        "question_name": "Ingresar el CNAME de Satellite",
+                        "question_description": "Especificar el CNAME",
+                        "required": true,
+                        "type": "text",
+                        "variable": "satellite_server_fqdn",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "satellite.uio.bpichincha.com",
+                        "choices": "",
+                        "new_question": true
+                    },
+				    {
+                        "question_name": "Ingresar activation key para las capsulas",
+                        "question_description": "Inserte activation key",
+                        "required": true,
+                        "type": "text",
+                        "variable": "satellite_capsule_activation_key",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": "",
+                        "new_question": false
+                    },
+                    {
+                        "question_name": "Ingresar el organization ID",
+                        "question_description": "Ingresar el id de la organización",
+                        "required": true,
+                        "type": "text",
+                        "variable": "satellite_capsule_org_id",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "Banco Pichincha",
+                        "choices": "",
+                        "new_question": true
+                    },
+					{
+                        "question_name": "Ingresar la versión de Red Hat Satellite",
+                        "question_description": "Versión de producto",
+                        "required": true,
+                        "type": "text",
+                        "variable": "satellite_version",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "6.15",
+                        "choices": "",
+                        "new_question": true
+                    },
+					{
+                        "question_name": "Ingresar la zona horaria",
+                        "question_description": "Zona horaria para el seervidor",
+                        "required": true,
+                        "type": "text",
+                        "variable": "satellite_capsule_timezone",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "America/Guayaquil",
+                        "choices": "",
+                        "new_question": true
+                    },
+					{
+                        "question_name": "Ingresar la location de la capsula",
+                        "question_description": "Ubicación de la capsula",
+                        "required": true,
+                        "type": "text",
+                        "variable": "capsule_location",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": "",
+                        "new_question": true
+                    }
+                ]
+            }
+		},
+		{
+			"name": "PROD-2-Satellite Server - Gestión de Ubicaciones",
+			"description": "Playbook para gestión de las ubicaciones de Satellite Server",
+			"job_type": "run",
+			"inventory_name": "PROD-Servidores Satellite",
+			"playbook_file": "crear_satellite_locations.yml",
+			"execution_groups": [
+				"ArqPlataformas"
+			],
+			"execution_environment":"EE-unix-satellite",
+			"extra_vars": {},
+			"ask_job_type_on_launch":false,
+			"ask_verbosity_on_launch":true,
+			"ask_limit_on_launch":false,
+			"forks":5,
+			"is_part_of_workflow":false,
+			"survey_enabled": true,
+			"survey_spec": {
+				"name": "",
+				"description": "",
+				"spec": [
+                   {
+                        "question_name": "Ingresar el nombre de la organización",
+                        "question_description": "Ingresar el nombre de la organización dentro de la cual se desea modificar la ubicación o ubicaciones",
+                        "required": true,
+                        "type": "text",
+                        "variable": "satellite_organization",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": "",
+                        "new_question": true
+                    },
+					{
+                        "question_name": "Ingresar el nombre(s) de la(s) ubicación(es)",
+                        "question_description": "Ingresar el nombre de la ubicación o las ubicaciones que se desea modificar",
+                        "required": true,
+                        "type": "textarea",
+                        "variable": "satellite_location_name",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": "",
+                        "new_question": true
+                    },
+					{
+                        "question_name": "Ingresar la acción a realizar",
+                        "question_description": "Seleccionar la acción que se desea llevar a cabo",
+                        "required": true,
+                        "type": "multiplechoice",
+                        "variable": "satellite_loc_action",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": [
+                            "crear",
+							"borrar"
+                        ],
+                        "new_question": false
+                    }
+                ]
+            }
+		},
+		{
+			"name": "PROD-3-Satellite Server - Gestión de Manifiestos de Contenido",
+			"description": "Playbook para gestión de Manifiestos",
+			"job_type": "run",
+			"inventory_name": "PROD-Servidores Satellite",
+			"playbook_file": "crear_satellite_manifest.yml",
+			"execution_groups": [
+				"ArqPlataformas"
+			],
+			"execution_environment":"EE-unix-satellite",
+			"extra_vars": {},
+			"ask_job_type_on_launch":false,
+			"ask_verbosity_on_launch":true,
+			"ask_limit_on_launch":false,
+			"forks":5,
+			"is_part_of_workflow":false,
+			"survey_enabled": true,
+			"survey_spec": {
+				"name": "",
+				"description": "",
+				"spec": [
+                   {
+                        "question_name": "Ingresar el nombre de la organización",
+                        "question_description": "Ingresar el nombre de la organización dentro de la cual se desea modificar la ubicación o ubicaciones",
+                        "required": true,
+                        "type": "text",
+                        "variable": "satellite_organization",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": "",
+                        "new_question": true
+                    },
+					{
+                        "question_name": "Ingresar el usuario del portal de clientes de Red Hat",
+                        "question_description": "Usuario para el Portal de Red Hat",
+                        "required": true,
+                        "type": "text",
+                        "variable": "satellite_rhsm_username",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": "",
+                        "new_question": true
+                    },
+					{
+                        "question_name": "Ingresar el password del usuario del portal de Red Hat",
+                        "question_description": "Contraseña para el Portal de Red Hat",
+                        "required": true,
+                        "type": "password",
+                        "variable": "satellite_rhsm_password",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": "",
+                        "new_question": true
+                    },
+					{
+                        "question_name": "Ingresar el UUID del manifiesto",
+                        "question_description": "UUID del manifiesto se puede obtener del Portal de Red Hat",
+                        "required": true,
+                        "type": "text",
+                        "variable": "satellite_manifest_uuid",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": "",
+                        "new_question": true
+                    },
+					{
+                        "question_name": "Ingresar la acción a realizar",
+                        "question_description": "Seleccionar la acción que se desea llevar a cabo",
+                        "required": true,
+                        "type": "multiplechoice",
+                        "variable": "satellite_manifest_action",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": [
+                            "cargar",
+							"borrar"
+                        ],
+                        "new_question": false
+                    }
+                ]
+            }
+		},
+		{
+			"name": "PROD-4-Satellite Server - Gestión de Repositorios de Arquitectura por Defecto",
+			"description": "Playbook para gestión de repositorios",
+			"job_type": "run",
+			"inventory_name": "PROD-Servidores Satellite",
+			"playbook_file": "crear_satellite_repositories.yml",
+			"execution_groups": [
+				"ArqPlataformas"
+			],
+			"execution_environment":"EE-unix-satellite",
+			"extra_vars": {},
+			"ask_job_type_on_launch":false,
+			"ask_verbosity_on_launch":true,
+			"ask_limit_on_launch":false,
+			"forks":5,
+			"is_part_of_workflow":false,
+			"survey_enabled": true,
+			"survey_spec": {
+				"name": "",
+				"description": "",
+				"spec": [
+                   {
+                        "question_name": "Ingresar el nombre de la organización",
+                        "question_description": "Ingresar el nombre de la organización",
+                        "required": true,
+                        "type": "text",
+                        "variable": "satellite_organization",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": "",
+                        "new_question": true
+                    },
+                    {
+                        "question_name": "Ingresar la acción a realizar",
+                        "question_description": "Seleccionar la acción que se desea llevar a cabo",
+                        "required": true,
+                        "type": "multiplechoice",
+                        "variable": "satellite_repository_action",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": [
+                            "Habilitar",
+							"Deshabilitar"
+                        ],
+                        "new_question": true
+                    },
+					{
+                        "question_name": "Ingresar el nombre del repositorio que se desea modificar",
+                        "question_description": "Nombre del repositorio",
+                        "required": true,
+                        "type": "text",
+                        "variable": "satellite_label",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": "",
+                        "new_question": true
+                    },
+					{
+                        "question_name": "Ingresar la versión",
+                        "question_description": "Versión del repositorio",
+                        "required": true,
+                        "type": "text",
+                        "variable": "repository_releasever",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": "",
+                        "new_question": true
+                    },
+					{
+                        "question_name": "Ingresar el base arch",
+                        "question_description": "Base architecture para el repositorio",
+                        "required": true,
+                        "type": "multiplechoice",
+                        "variable": "repository_basearch",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": [
+                            "x86_64",
+							"ppc64",
+                            "s390x"
+                        ],
+                        "new_question": false
+                    }
+                ]
+            }
+		},
+		{
+			"name": "PROD-5-Satellite Server - Gestión de Repositorios Individuales",
+			"description": "Playbook para gestión de repositorios",
+			"job_type": "run",
+			"inventory_name": "PROD-Servidores Satellite",
+			"playbook_file": "crear_satellite_repositories_individual.yml",
+			"execution_groups": [
+				"ArqPlataformas"
+			],
+			"execution_environment":"EE-unix-satellite",
+			"extra_vars": {},
+			"ask_job_type_on_launch":false,
+			"ask_verbosity_on_launch":true,
+			"ask_limit_on_launch":false,
+			"forks":5,
+			"is_part_of_workflow":false,
+			"survey_enabled": true,
+			"survey_spec": {
+				"name": "",
+				"description": "",
+				"spec": [
+                   {
+                        "question_name": "Ingresar el nombre de la organización",
+                        "question_description": "Ingresar el nombre de la organización",
+                        "required": true,
+                        "type": "text",
+                        "variable": "satellite_organization",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": "",
+                        "new_question": true
+                    },
+                    {
+                        "question_name": "Ingresar la acción a realizar",
+                        "question_description": "Seleccionar la acción que se desea llevar a cabo",
+                        "required": true,
+                        "type": "multiplechoice",
+                        "variable": "satellite_repository_action",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": [
+                            "Habilitar",
+							"Deshabilitar"
+                        ],
+                        "new_question": true
+                    },
+					{
+                        "question_name": "Ingresar el nombre del repositorio que se desea modificar",
+                        "question_description": "Nombre del repositorio",
+                        "required": true,
+                        "type": "text",
+                        "variable": "satellite_label",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": "",
+                        "new_question": true
+                    },
+					{
+                        "question_name": "Ingresar la versión",
+                        "question_description": "Versión del repositorio",
+                        "required": true,
+                        "type": "text",
+                        "variable": "repository_releasever",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": "",
+                        "new_question": true
+                    },
+					{
+                        "question_name": "Ingresar el base arch",
+                        "question_description": "Base architecture para el repositorio",
+                        "required": true,
+                        "type": "multiplechoice",
+                        "variable": "repository_basearch",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": [
+                            "x86_64",
+							"ppc64",
+                            "s390x"
+                        ],
+                        "new_question": false
+                    }
+                ]
+            }
+		},
+        {
+			"name": "PROD-6-Satellite Server - Gestión de Repositorios de Ciclos de Vida de Entornos Completos",
+			"description": "Playbook para gestión de ciclos de vida",
+			"job_type": "run",
+			"inventory_name": "PROD-Servidores Satellite",
+			"playbook_file": "registrar_multiples_satellite_lifecycle_environment.yml",
+			"execution_groups": [
+				"ArqPlataformas"
+			],
+			"execution_environment":"EE-unix-satellite",
+			"extra_vars": {},
+			"ask_job_type_on_launch":false,
+			"ask_verbosity_on_launch":true,
+			"ask_limit_on_launch":false,
+			"forks":5,
+			"is_part_of_workflow":false,
+			"survey_enabled": true,
+			"survey_spec": {
+				"name": "",
+				"description": "",
+				"spec": [
+                   {
+                        "question_name": "Ingresar el nombre de la organización",
+                        "question_description": "Ingresar el nombre de la organización",
+                        "required": true,
+                        "type": "text",
+                        "variable": "satellite_organization",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": "",
+                        "new_question": true
+                    },
+                    {
+                        "question_name": "Ingresar la acción a realizar",
+                        "question_description": "Seleccionar la acción que se desea llevar a cabo",
+                        "required": true,
+                        "type": "multiplechoice",
+                        "variable": "satellite_lifecycle_state",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": [
+                            "Crear",
+							"Borrar"
+                        ],
+                        "new_question": true
+                    },
+					{
+                        "question_name": "Ingresar la ruta de Lifecycle Environment",
+                        "question_description": "Ruta donde se guardará el Lifecycle Environment",
+                        "required": true,
+                        "type": "textarea",
+                        "variable": "lifecycle_environment_complete",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "[{'lifecycle_environment_name':'le1','lifecycle-environment_prior':'Library'},{'lifecycle_environment_name':'le2','lifecycle-environment_prior':'le1'},{'lifecycle_environment_name':'le3','lifecycle-environment_prior':'le2'}]",
+                        "choices": "",
+                        "new_question": false
+                    }
+                ]
+            }
+		},
+        {
+			"name": "PROD-7-Satellite Server - Gestión de Repositorios de Ciclos de Vida de Entornos Individuales",
+			"description": "Playbook para gestión de entornos de ciclos de vida",
+			"job_type": "run",
+			"inventory_name": "PROD-Servidores Satellite",
+			"playbook_file": "registrar_satellite_lifecycle_environment_individual.yml",
+			"execution_groups": [
+				"ArqPlataformas"
+			],
+			"execution_environment":"EE-unix-satellite",
+			"extra_vars": {},
+			"ask_job_type_on_launch":false,
+			"ask_verbosity_on_launch":true,
+			"ask_limit_on_launch":false,
+			"forks":5,
+			"is_part_of_workflow":false,
+			"survey_enabled": true,
+			"survey_spec": {
+				"name": "",
+				"description": "",
+				"spec": [
+                   {
+                        "question_name": "Ingresar el nombre de la organización",
+                        "question_description": "Ingresar el nombre de la organización",
+                        "required": true,
+                        "type": "text",
+                        "variable": "satellite_organization",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": "",
+                        "new_question": true
+                    },
+                    {
+                        "question_name": "Ingresar el nombre del Environment que se desea crear",
+                        "question_description": "Nombre del entorno a crear",
+                        "required": true,
+                        "type": "text",
+                        "variable": "lifecycle_environment_name",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": "",
+                        "new_question": true
+                    },
+					{
+                        "question_name": "Ingresar descripción del Environment",
+                        "question_description": "Descripción del entorno a crear",
+                        "required": true,
+                        "type": "text",
+                        "variable": "lifecycle_environment_description",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": "",
+                        "new_question": true
+                    },
+					{
+                        "question_name": "Ingresar el Environment base desde el cual se desea crear el Environment",
+                        "question_description": "Entorno previo o base para el nuevo",
+                        "required": true,
+                        "type": "text",
+                        "variable": "lifecycle_environment_prior",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": "",
+                        "new_question": true
+                    },
+                    {
+                        "question_name": "Ingresar la acción a realizar",
+                        "question_description": "Seleccionar la acción que se desea llevar a cabo",
+                        "required": true,
+                        "type": "multiplechoice",
+                        "variable": "satellite_lifecycle_state",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": [
+                            "crear"
+                        ],
+                        "new_question": false
+                    }
+                ]
+            }
+		},
+        {
+			"name": "PROD-8-Satellite Server - Gestión de Vistas de Contenido",
+			"description": "Playbook para gestión de vistas de contenido",
+			"job_type": "run",
+			"inventory_name": "PROD-Servidores Satellite",
+			"playbook_file": "registrar_satellite_content_view.yml",
+			"execution_groups": [
+				"ArqPlataformas"
+			],
+			"execution_environment":"EE-unix-satellite",
+			"extra_vars": {},
+			"ask_job_type_on_launch":false,
+			"ask_verbosity_on_launch":true,
+			"ask_limit_on_launch":false,
+			"forks":5,
+			"is_part_of_workflow":false,
+			"survey_enabled": true,
+			"survey_spec": {
+				"name": "",
+				"description": "",
+				"spec": [
+                   {
+                        "question_name": "Ingresar el nombre de la organización",
+                        "question_description": "Ingresar el nombre de la organización",
+                        "required": true,
+                        "type": "text",
+                        "variable": "satellite_organization",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": "",
+                        "new_question": true
+                    },
+                    {
+                        "question_name": "Ingresar el nombre de la vista de contenido",
+                        "question_description": "Nombre de la vista de contenido",
+                        "required": true,
+                        "type": "text",
+                        "variable": "satellite_cv_name",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": "",
+                        "new_question": true
+                    },
+                    {
+                        "question_name": "Ingresar la acción a realizar",
+                        "question_description": "Seleccionar la acción que se desea llevar a cabo",
+                        "required": true,
+                        "type": "multiplechoice",
+                        "variable": "satellite_cv_action",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": [
+                            "Crear",
+                            "Modificar",
+                            "Borrar"
+                        ],
+                        "new_question": true
+                    },
+                    {
+                        "question_name": "Ingresar los repositorios a habilitar en la vista de contenido",
+                        "question_description": "Nombre de la vista de contenido",
+                        "required": true,
+                        "type": "textarea",
+                        "variable": "repositorios_enabled",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "[{'repositories':[{'name':'Red Hat Enterprise Linux 8 for x86_64 - BaseOS RPMs 8', 'product':'Red Hat Enterprise Linux for x86_64'},{'name':'Red Hat Enterprise Linux 9 for x86_64 - BaseOS RPMs 8', 'product':'Red Hat Enterprise Linux for x86_64'}]}]",
+                        "choices": "",
+                        "new_question": false
+                    }
+                ]
+            }
+		},
+        {
+			"name": "PROD-9-Publicación o eliminación de versiones de vistas de contenido",
+			"description": "Playbook para eliminación de vistas de contenido",
+			"job_type": "run",
+			"inventory_name": "PROD-Servidores Satellite",
+			"playbook_file": "publicar_satellite_content_view_publish.yml",
+			"execution_groups": [
+				"ArqPlataformas"
+			],
+			"execution_environment":"EE-unix-satellite",
+			"extra_vars": {},
+			"ask_job_type_on_launch":false,
+			"ask_verbosity_on_launch":true,
+			"ask_limit_on_launch":false,
+			"forks":5,
+			"is_part_of_workflow":false,
+			"survey_enabled": true,
+			"survey_spec": {
+				"name": "",
+				"description": "",
+				"spec": [
+                   {
+                        "question_name": "Ingresar el nombre de la organización",
+                        "question_description": "Ingresar el nombre de la organización",
+                        "required": true,
+                        "type": "text",
+                        "variable": "satellite_organization",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": "",
+                        "new_question": true
+                    },
+                    {
+                        "question_name": "Ingresar el nombre de la vista de contenido",
+                        "question_description": "Nombre de la vista de contenido",
+                        "required": true,
+                        "type": "text",
+                        "variable": "satellite_cv_name",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": "",
+                        "new_question": true
+                    },
+                    {
+                        "question_name": "Ingresar la versión del lifecycle environment",
+                        "question_description": "Versión del Lifecycle Environment",
+                        "required": true,
+                        "type": "text",
+                        "variable": "satellite_cv_version",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": "",
+                        "new_question": true
+                    },
+                    {
+                        "question_name": "Agregar los lifecycles environments donde se publica vista de contenido",
+                        "question_description": "Seleccionar la acción que se desea llevar a cabo",
+                        "required": true,
+                        "type": "multiplechoice",
+                        "variable": "satellite_cv_lifecycle_environments",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": [
+                            "Library",
+                            "DEV",
+                            "TEST",
+                            "PROD"
+                        ],
+                        "new_question": true
+                    },
+                    {
+                        "question_name": "Ingresar los repositorios a habilitar en la vista de contenido",
+                        "question_description": "Nombre de la vista de contenido",
+                        "required": true,
+                        "type": "textarea",
+                        "variable": "repositorios_enabled",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "[{'repositories':[{'name':'Red Hat Enterprise Linux 8 for x86_64 - BaseOS RPMs 8', 'product':'Red Hat Enterprise Linux for x86_64'},{'name':'Red Hat Enterprise Linux 9 for x86_64 - BaseOS RPMs 8', 'product':'Red Hat Enterprise Linux for x86_64'}]}]",
+                        "choices": "",
+                        "new_question": true
+                    },
+                    {
+                        "question_name": "Ingresar la acción a realizar",
+                        "question_description": "Seleccionar la acción que se desea llevar a cabo",
+                        "required": true,
+                        "type": "multiplechoice",
+                        "variable": "satellite_cv_action",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": [
+                            "Publicar",
+                            "Borrar"
+                        ],
+                        "new_question": false
+                    }
+                ]
+            }
+		},
+        {
+			"name": "PROD-10-Sincronización de repositorios o productos",
+			"description": "Playbook para sincronización de repos o productos",
+			"job_type": "run",
+			"inventory_name": "PROD-Servidores Satellite",
+			"playbook_file": "sincronizar_satellite_repositories.yml",
+			"execution_groups": [
+				"ArqPlataformas"
+			],
+			"execution_environment":"EE-unix-satellite",
+			"extra_vars": {},
+			"ask_job_type_on_launch":false,
+			"ask_verbosity_on_launch":true,
+			"ask_limit_on_launch":false,
+			"forks":5,
+			"is_part_of_workflow":false,
+			"survey_enabled": true,
+			"survey_spec": {
+				"name": "",
+				"description": "",
+				"spec": [
+                   {
+                        "question_name": "Ingresar el nombre de la organización",
+                        "question_description": "Ingresar el nombre de la organización",
+                        "required": true,
+                        "type": "text",
+                        "variable": "satellite_organization",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": "",
+                        "new_question": true
+                    },
+                    {
+                        "question_name": "Ingresar el nombre del repositorio",
+                        "question_description": "Nombre del repositorio",
+                        "required": true,
+                        "type": "text",
+                        "variable": "repository_name",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": "",
+                        "new_question": true
+                    },
+                    {
+                        "question_name": "Ingresar el nombre del producto",
+                        "question_description": "Nombre del producto",
+                        "required": true,
+                        "type": "text",
+                        "variable": "satellite_cv_version",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": "",
+                        "new_question": false
+                    }
+                ]
+            }
+		},
+        {
+			"name": "PROD-11-Gestión de Activation Keys",
+			"description": "Playbook para sincronización de repos o productos",
+			"job_type": "run",
+			"inventory_name": "PROD-Servidores Satellite",
+			"playbook_file": "crear_satellite_activation_keys.yml",
+			"execution_groups": [
+				"ArqPlataformas"
+			],
+			"execution_environment":"EE-unix-satellite",
+			"extra_vars": {},
+			"ask_job_type_on_launch":false,
+			"ask_verbosity_on_launch":true,
+			"ask_limit_on_launch":false,
+			"forks":5,
+			"is_part_of_workflow":false,
+			"survey_enabled": true,
+			"survey_spec": {
+				"name": "",
+				"description": "",
+				"spec": [
+                   {
+                        "question_name": "Ingresar el nombre de la organización",
+                        "question_description": "Ingresar el nombre de la organización",
+                        "required": true,
+                        "type": "text",
+                        "variable": "satellite_organization",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": "",
+                        "new_question": true
+                    },
+                    {
+                        "question_name": "Ingresar el nombre de la llave de activación",
+                        "question_description": "Nombre de la llave de activación",
+                        "required": true,
+                        "type": "text",
+                        "variable": "satellite_activation_key_name",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": "",
+                        "new_question": true
+                    },
+                    {
+                        "question_name": "Ingresar el ciclo de vida donde se desea asignar la llave de activación",
+                        "question_description": "Nombre del ciclo de vida",
+                        "required": true,
+                        "type": "text",
+                        "variable": "satellite_lifecycle_environment",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": "",
+                        "new_question": true
+                    },
+                    {
+                        "question_name": "Ingresar los repositorios adicionales",
+                        "question_description": "Nombre de los repositorios para los activation keys",
+                        "required": false,
+                        "type": "textarea",
+                        "variable": "satellite_override_content",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "[{'content_overrides':[{'label':'satellite-client-6-for-rhel-8-rpms','override':'enabled'}, {'label':'satellite-client-6-for-rhel-9-rpms','override':'enabled'}]}]",
+                        "choices": "",
+                        "new_question": true
+                    },
+                    {
+                        "question_name": "Digitar los host collections",
+                        "question_description": "Nombre de los host collections",
+                        "required": false,
+                        "type": "text",
+                        "variable": "satellite_host_collections",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": "",
+                        "new_question": true
+                    },
+                    {
+                        "question_name": "Ingresar la acción a realizar",
+                        "question_description": "Seleccionar la acción que se desea llevar a cabo",
+                        "required": true,
+                        "type": "multiplechoice",
+                        "variable": "satellite_activation_key_action",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": [
+                            "crear",
+                            "actualizar"
+                        ],
+                        "new_question": true
+                    },
+                    {
+                        "question_name": "Ingresar el nombre del content view",
+                        "question_description": "Nombre de los host collections",
+                        "required": true,
+                        "type": "text",
+                        "variable": "satellite_contentview_name",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": "",
+                        "new_question": true
+                    },
+                    {
+                        "question_name": "Activar Auto-Attach en activation key",
+                        "question_description": "Seleccione esta opción para attach el activation key",
+                        "required": true,
+                        "type": "text",
+                        "variable": "satellite_auto_attach_key",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "yes",
+                        "choices": "",
+                        "new_question": false
+                    }
+                ]
+            }
+		},
+        {
+			"name": "PROD-12-Suscribir nuevo host",
+			"description": "Playbook para suscripción de nuevos hosts/servers",
+			"job_type": "run",
+			"inventory_name": "PROD-Servidores Satellite",
+			"playbook_file": "suscribir_satellite_client.yml",
+			"execution_groups": [
+				"ArqPlataformas"
+			],
+			"execution_environment":"EE-unix-satellite",
+			"extra_vars": {},
+			"ask_job_type_on_launch":false,
+			"ask_verbosity_on_launch":true,
+			"ask_limit_on_launch":false,
+			"forks":5,
+			"is_part_of_workflow":false,
+			"survey_enabled": true,
+			"survey_spec": {
+				"name": "",
+				"description": "",
+				"spec": [
+                   {
+                        "question_name": "Ingresar el FQDN del host a añadir",
+                        "question_description": "Ingresar el host a registrar",
+                        "required": true,
+                        "type": "text",
+                        "variable": "satellite_client_name",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": "",
+                        "new_question": true
+                    },
+                    {
+                        "question_name": "Ingresar el nombre de la organización donde se va a suscribir el host cliente",
+                        "question_description": "Ingresar el nombre de la organización",
+                        "required": true,
+                        "type": "text",
+                        "variable": "satellite_capsule_org_id",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": "",
+                        "new_question": true
+                    },
+                    {
+                        "question_name": "Ingresar el Location para la máquina",
+                        "question_description": "Nombre de la ubicación",
+                        "required": true,
+                        "type": "text",
+                        "variable": "location_name",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": "",
+                        "new_question": true
+                    },
+                    {
+                        "question_name": "Ingresar la activation key que va a usar este cliente",
+                        "question_description": "Nombre de la activation key",
+                        "required": true,
+                        "type": "text",
+                        "variable": "satellite_capsule_activation_key",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": "",
+                        "new_question": true
+                    },
+                    {
+                        "question_name": "Ingrese el FQDN de la capsula que se suscribirá el host",
+                        "question_description": "Nombre de la capsula a usar",
+                        "required": true,
+                        "type": "text",
+                        "variable": "satellite_capsule_fqdn",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": "",
+                        "new_question": true
+                    },
+                    {
+                        "question_name": "Seleccione entre Capsule o Server",
+                        "question_description": "Donde se suscribirá el host",
+                        "required": true,
+                        "type": "multiplechoice",
+                        "variable": "satellite_registration",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": [
+                            "Satellite Server",
+                            "Satellite Capsule"
+                        ],
+                        "new_question": false
+                    }
+                ]
+            }
+		},
+        {
+			"name": "PROD-13-Planes de sincronización",
+			"description": "Playbook para crear los planes de sincronización",
+			"job_type": "run",
+			"inventory_name": "PROD-Servidores Satellite",
+			"playbook_file": "crear_satellite_sync_plan.yml",
+			"execution_groups": [
+				"ArqPlataformas"
+			],
+			"execution_environment":"EE-unix-satellite",
+			"extra_vars": {},
+			"ask_job_type_on_launch":false,
+			"ask_verbosity_on_launch":true,
+			"ask_limit_on_launch":false,
+			"forks":5,
+			"is_part_of_workflow":false,
+			"survey_enabled": true,
+			"survey_spec": {
+				"name": "",
+				"description": "",
+				"spec": [
+                   {
+                        "question_name": "Ingresar el nombre de la organización",
+                        "question_description": "Ingresar el nombre de la organización",
+                        "required": true,
+                        "type": "text",
+                        "variable": "satellite_organization",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": "",
+                        "new_question": true
+                    },
+                    {
+                        "question_name": "Ingresar el nombre del plan de sincronización",
+                        "question_description": "Ingresar el plan de sincronización",
+                        "required": true,
+                        "type": "text",
+                        "variable": "satellite_sync_name",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": "",
+                        "new_question": true
+                    },
+                    {
+                        "question_name": "Ingresar el intervalo deseado para ese plan de sincronización",
+                        "question_description": "Intervalo para el plan de sincronización",
+                        "required": true,
+                        "type": "multiplechoice",
+                        "variable": "satellite_sync_interval",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": [
+                            "daily",
+                            "weekly",
+                            "hourly",
+                            "custom cron"
+                        ],
+                        "new_question": true
+                    },
+                    {
+                        "question_name": "Si escogió custom cron, escribir en formato cron el intervalo",
+                        "question_description": "Especificar intervalo para sincronización",
+                        "required": false,
+                        "type": "text",
+                        "variable": "satellite_sync_cron",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": "",
+                        "new_question": true
+                    },
+                    {
+                        "question_name": "Ingresar la acción a realizar",
+                        "question_description": "Seleccionar la acción que se desea llevar a cabo",
+                        "required": true,
+                        "type": "multiplechoice",
+                        "variable": "satellite_sync_action",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": [
+                            "deshabilitar",
+                            "crear"
+                        ],
+                        "new_question": true
+                    },
+                    {
+                        "question_name": "Ingresar el producto",
+                        "question_description": "Ingresar el nombre del producto",
+                        "required": true,
+                        "type": "text",
+                        "variable": "satellite_sync_products",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "Red Hat Enterprise Linux for x86_64",
+                        "choices": "",
+                        "new_question": false
+                    }
+                ]
+            }
+		},
+        {
+			"name": "DEV-14.1-Registrar Lifecycle Environment específico en capsula específica EnP",
+			"description": "Playbook para el registro de entorno de ciclo de vida",
+			"job_type": "run",
+			"inventory_name": "DEV-Servidores Satellite",
+			"playbook_file": "registrar_satellite_capsule_lifecycle_environment_individual_enp.yml",
+			"execution_groups": [
+				"ArqPlataformas"
+			],
+			"execution_environment":"EE-unix-satellite",
+			"extra_vars": {},
+			"ask_job_type_on_launch":false,
+			"ask_verbosity_on_launch":true,
+			"ask_limit_on_launch":false,
+			"forks":5,
+			"is_part_of_workflow":false,
+			"survey_enabled": true,
+			"survey_spec": {
+				"name": "",
+				"description": "",
+				"spec": [
+                   {
+                        "question_name": "Ingresar el nombre de la organización",
+                        "question_description": "Ingresar el nombre de la organización",
+                        "required": true,
+                        "type": "text",
+                        "variable": "organization_name",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": "",
+                        "new_question": true
+                    },
+                    {
+                        "question_name": "Ingresar el lifecycle environment a agregar",
+                        "question_description": "Ingresar el entorno de ciclo de vida a agregar",
+                        "required": true,
+                        "type": "text",
+                        "variable": "lifecycle_environments",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": "",
+                        "new_question": true
+                    },
+                    {
+                        "question_name": "Ingresar el intervalo deseado para ese plan de sincronización",
+                        "question_description": "Intervalo para el plan de sincronización",
+                        "required": true,
+                        "type": "multiplechoice",
+                        "variable": "satellite_sync_interval",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": [
+                            "daily",
+                            "weekly",
+                            "hourly",
+                            "custom cron"
+                        ],
+                        "new_question": true
+                    },
+                    {
+                        "question_name": "Ingresar el FQDN de la capsula",
+                        "question_description": "Especificar el FQDN de la capsula",
+                        "required": true,
+                        "type": "text",
+                        "variable": "inventory_hostname",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": "",
+                        "new_question": false
+                    }
+                ]
+            }
+		},
+        {
+			"name": "PROD-14.2-Registrar Lifecycle Environment específico en capsula específica Prod",
+			"description": "Playbook para el registro de entorno de ciclo de vida",
+			"job_type": "run",
+			"inventory_name": "PROD-Servidores Satellite",
+			"playbook_file": "registrar_satellite_capsule_lifecycle_environment_individual_prod.yml",
+			"execution_groups": [
+				"ArqPlataformas"
+			],
+			"execution_environment":"EE-unix-satellite",
+			"extra_vars": {},
+			"ask_job_type_on_launch":false,
+			"ask_verbosity_on_launch":true,
+			"ask_limit_on_launch":false,
+			"forks":5,
+			"is_part_of_workflow":false,
+			"survey_enabled": true,
+			"survey_spec": {
+				"name": "",
+				"description": "",
+				"spec": [
+                   {
+                        "question_name": "Ingresar el nombre de la organización",
+                        "question_description": "Ingresar el nombre de la organización",
+                        "required": true,
+                        "type": "text",
+                        "variable": "organization_name",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": "",
+                        "new_question": true
+                    },
+                    {
+                        "question_name": "Ingresar el lifecycle environment a agregar",
+                        "question_description": "Ingresar el entorno de ciclo de vida a agregar",
+                        "required": true,
+                        "type": "text",
+                        "variable": "lifecycle_environments",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": "",
+                        "new_question": true
+                    },
+                    {
+                        "question_name": "Ingresar el intervalo deseado para ese plan de sincronización",
+                        "question_description": "Intervalo para el plan de sincronización",
+                        "required": true,
+                        "type": "multiplechoice",
+                        "variable": "satellite_sync_interval",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": [
+                            "daily",
+                            "weekly",
+                            "hourly",
+                            "custom cron"
+                        ],
+                        "new_question": true
+                    },
+                    {
+                        "question_name": "Ingresar el FQDN de la capsula",
+                        "question_description": "Especificar el FQDN de la capsula",
+                        "required": true,
+                        "type": "text",
+                        "variable": "inventory_hostname",
+                        "min": 0,
+                        "max": 1024,
+                        "default": "",
+                        "choices": "",
+                        "new_question": false
+                    }
+                ]
+            }
+		}
+	]
+}

@@ -1,0 +1,9 @@
+- name: Crear o actualizar ubicaciones en la organizacion {{ satellite_organization }}.
+  delegate_to: localhost
+  redhat.satellite.location:
+    organizations: "{{ satellite_organization }}"
+    name: "{{ item }}"
+    state: present
+  loop: "{{ satellite_location_name | split('\n') }}"
+  loop_control:
+    label: "Creando ubicación {{ item }} en la organización {{ satellite_organization }}"

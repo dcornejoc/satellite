@@ -1,0 +1,70 @@
+== Prefacio
+
+=== Derechos de autor
+Este documento contiene información de propiedad exclusiva para uso exclusivo de Red Hat, Inc. y no debe compartirse con personal que no sea Red Hat, Inc. Este documento, y cualquier parte del mismo, no puede ser copiado, reproducido, fotocopiado ni almacenado electrónicamente. En un sistema de recuperación, o transmitido sin el consentimiento expreso por escrito del propietario.
+Red Hat Consulting no garantiza que este documento esté libre de errores u omisiones. Red Hat Consulting se reserva el derecho de hacer correcciones, actualizaciones, revisiones o cambios a la información contenida en este documento. Red Hat Consulting no garantiza que el material descrito en este documento esté libre de infracción de patente.
+A menos que Red Hat Consulting proporcione lo contrario por escrito, la información y los programas descritos en este documento se proporcionan "tal cual" sin garantía de ningún tipo, incluidas, entre otras, las garantías implícitas de comercialización y adecuación para un propósito particular. En ningún caso Red Hat Consulting, sus funcionarios, directores o empleados o afiliados de Red Hat Consulting, sus respectivos funcionarios, directores o empleados serán responsables ante cualquier entidad por cualquier daño especial, colateral, incidental o consecuente, incluso sin ningún tipo de daño. Limitación, por cualquier ganancia pérdida o pérdida de ahorros, relacionada o que surja de alguna manera por el uso o por la imposibilidad de usar la información o los programas establecidos en este documento, incluso si ha sido notificado de la posibilidad de tal daño por parte del comprador o Cualquier tercero.
+
+=== Distribución
+No reenvíe ni copie sin el permiso por escrito de Red Hat Consulting.
+Las copias de este documento están restringidas a los siguientes nombres:
+
+
+* Red Hat Inc.
+* Banco Pichincha
+
+=== Confidencialidad
+Toda la información suministrada por el Banco Pichincha, para los fines de este compromiso se considerará confidencial de Red Hat.
+
+=== Copias Adicionales
+Se pueden obtener copias adicionales de este documento con el Services Delivery Manager a través de los
+contactos en la sección de Información de contacto de Red Hat Consulting.
+
+=== Acerca de este documento
+Este documento tiene como objetivo presentar el resultado de las revisiones en los cluster y herramientas de monitoreo del ambiente productivo, donde se agregaran las evidencias y recomendaciones que se consideren necesarias para el correcto funcionamiento de las plataformas.
+
+
+=== Contactos del equipo de Red Hat para este proyecto
+Para obtener información adicional sobre la contenida en este documento, puede contactar con uno de los siguientes miembros del equipo de Red Hat:
+
+[cols="1,1,1"]
+|===
+|*Nombre*
+|*Titulo*
+|*Email*
+|Fernando Valenzuela
+|Consultant 
+|fvalenzu@redhat.com
+|Ingrid Bohorquez
+|Project Manager 
+|ibohorq@redhat.com
+|=== 
+
+=== Control de Versiones
+
+[cols="1,1,1,1"]
+|===
+|*Version*
+|*Autor*
+|*Descripción*
+|*Fecha*
+
+|1.0
+|Red Hat
+|Definición inicial del documento.
+|23/01/2022
+|=== 
+== Revisión de Clusters
+El informe con el resumen de la revisión del estado del clusters del Banco Pichincha se detalla a continuación:
+
+[cols="1,1,1"]
+|===
+|*Cluster*
+|*Versión OCP*
+|*Cluster API*
+
+|Productivo
+|3.11.784
+|https://openshift.prod.bpichincha.com
+|=== 
+

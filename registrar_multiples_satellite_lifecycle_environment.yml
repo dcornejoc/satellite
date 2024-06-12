@@ -1,0 +1,36 @@
+---
+- name: Gestion de lifecycle_environment en Satellite.
+  hosts: localhost
+  gather_facts: false
+  become: false
+  collections:
+    - redhat.satellite
+  tasks:
+    - name: Creando rutas de lifecycle_environment completas en Satellite.
+      when:
+        - satellite_lifecycle_state == "Crear"
+      redhat.satellite.lifecycle_environment:
+        name: "{{ item['lifecycle_environment_name'] }}"
+        label: "{{ item['lifecycle_environment_name'] }}"
+        organization: "{{ satellite_organization }}"
+        prior: "{{ item['lifecycle_environment_prior'] }}"
+        description: "{{ item['lifecycle_environment_description'] | default(omit) }}"
+        state: present
+      loop: "{{ lifecycle_environment_complete }}"
+      loop_control:
+        label: "Creando lifecycle {{ item['lifecycle_environment_name'] }} a partir del lifecycle {{ item['lifecycle_environment_prior'] }}"
+
+    - name: Borrando rutas de lifecycle_environment completas en Satellite.
+      when:
+        - satellite_lifecycle_state == "Borrar"
+      redhat.satellite.lifecycle_environment:
+        name: "{{ item['lifecycle_environment_name'] }}"
+        label: "{{ item['lifecycle_environment_name'] }}"
+        organization: "{{ satellite_organization }}"
+        prior: "{{ item['lifecycle_environment_prior'] }}"
+        description: "{{ item['lifecycle_environment_description'] | default(omit) }}"
+        state: absent
+      loop: "{{ lifecycle_environment_complete }}"
+      loop_control:
+        label: "Borrando lifecycle {{ item['lifecycle_environment_name'] }} a partir del lifecycle {{ item['lifecycle_environment_prior'] }}"
+...

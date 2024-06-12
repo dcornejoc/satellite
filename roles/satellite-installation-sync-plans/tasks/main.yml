@@ -1,0 +1,39 @@
+---
+- name: Crear plan de sincronizacion en Satellite Server usando intervalos de tiempo.
+  delegate_to: localhost
+  when:
+    - satellite_sync_interval != "custom cron"
+  redhat.satellite.sync_plan:
+    name: "{{ satellite_sync_name }}"
+    organization: "{{ satellite_organization }}"
+    interval: "{{ satellite_sync_interval }}"
+    sync_date: "{{ ansible_facts['date_time']['date'] }} {{ ansible_facts['date_time']['time'] }} {{ ansible_facts['date_time']['tz'] }}"
+    products: "{{ satellite_sync_products }}"
+    enabled: True
+    state: present
+  ignore_errors: true
+
+- name: Crear plan de sincronizacion en Satellite Server usando intervalos de tiempo personalizado.
+  delegate_to: localhost
+  when:
+    - satellite_sync_interval == "custom cron"
+  redhat.satellite.sync_plan:
+    name: "{{ satellite_sync_name }}"
+    organization: "{{ satellite_organization }}"
+    interval: "{{ satellite_sync_interval }}"
+    cron_expression: "{{ satellite_sync_cron | default(omit) }}"
+    sync_date: "{{ ansible_facts['date_time']['date'] }} {{ ansible_facts['date_time']['time'] }} {{ ansible_facts['date_time']['tz'] }}"
+    products: "{{ satellite_sync_products }}"
+    enabled: True
+    state: present
+  ignore_errors: true
+
+- name: Sincronizacion inmediata de repositorios o productos.
+  delegate_to: localhost
+  redhat.satellite.repository_sync:
+    organization: "{{ satellite_organization }}"
+    repository: "{{ repository_name | default(omit) }}"
+    product: "{{ item }}"  
+  loop: "{{ satellite_sync_products }}"
+  ignore_errors: true
+

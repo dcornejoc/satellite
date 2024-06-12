@@ -1,0 +1,9 @@
+---
+satellite_organization: "Banco Pichincha"
+satellite_sync_products:
+  - "Red Hat Ansible Automation Platform"
+  - "Red Hat CodeReady Linux Builder for x86_64"
+  - "Red Hat Directory Server"
+  - "Red Hat Enterprise Linux for x86_64"
+  - "Red Hat OpenShift Container Platform"
+  - "Red Hat Software Collections (for RHEL Server)"

@@ -1,0 +1,659 @@
+---
+- name: "Banco Pichincha :: Generar Healthcheck de Red Hat Satellite"
+  hosts: localhost
+  vars_files:
+    - vars/rhs_vars.yml
+  pre_tasks:
+
+    - name: "Banco Pichincha :: Generar Healthcheck de Red Hat Satellite :: Generar directorio para healthcheck"
+      tags:
+        - always
+      ansible.builtin.template:
+        src: "{{ item }}"
+        dest: "inputs/{{ item.split('.').0 + '.' + item.split('.').1 }}"
+        mode: "0755"
+      loop:
+        - "prefacio.adoc.j2"
+        - "redhat-theme.yml.j2"
+        - "variables.txt.j2"
+        - "salidas_satellite.adoc.j2"
+        - "salidas_nodes.adoc.j2"
+        - "healthcheck_content.adoc.j2"
+        - "salidas_filesystem_server.html.j2"
+        - "salidas_filesystem_capsules.html.j2"
+
+  tasks:
+
+    - name: Obtener status de la API de Satellite para Satellite Server
+      delegate_to: localhost
+      ansible.builtin.uri:
+        url: "{{ lookup('env', 'SATELLITE_SERVER_URL') }}/api/status"
+        method: GET
+        user: "{{ lookup('env', 'SATELLITE_USERNAME') }}"
+        password: "{{ lookup('env', 'SATELLITE_PASSWORD') }}"
+        force_basic_auth: true
+        validate_certs: "{{ lookup('env', 'SATELLITE_VALIDATE_CERTS') }}"
+      register: api_status_server
+
+    - name: Exportar status de la API de Satellite del Satellite Server a archivo
+      delegate_to: localhost
+      ansible.builtin.lineinfile:
+        path: "inputs/salidas_satellite.adoc"
+        insertafter: EOF
+        line: |
+          {% if api_status_server['json']['result'] == 'ok' %}
+          == Estado de la api de Satellite Server
+          [source,bash]
+          ---
+          La API de Satellite versión {{ api_status_server['json']['satellite_version'] }} está operativa (Estado HTTP: {{ api_status_server['json']['status'] }}).
+          ---
+          {% else %}
+          == Estado de la api de Satellite Server
+          [source,bash]
+          ---
+          La API de Satellite no está funcionando correctamente (Estado HTTP: {{ api_status_server['json']['status'] }}).
+          ---
+          {% endif %}
+
+      when: "api_status_server is defined"
+
+- name: Red Hat Satellite Server And Capsule Status
+  hosts: all
+  become: true
+  vars_files:
+    - vars/rhs_vars.yml
+  tasks:
+
+  - name: Listar servicios en Satellite Server
+    ansible.builtin.command: sudo satellite-maintain service list
+    register: satellite_service_list_server
+    when: "'SATELLITE_SERVER' in group_names"
+
+  - name: Ejecutar chequeo de salud en Satellite Server
+    ansible.builtin.expect:
+      command: sudo satellite-maintain health check
+      responses:
+        (?i)Continue with step \[Restart applicable services\]\?, \[y\(yes\), n\(no\)\]: "n"
+      echo: true
+    register: satellite_health_check_server
+    ignore_errors: true
+    failed_when: satellite_health_check_server.rc != 0
+    when: "'SATELLITE_SERVER' in group_names"
+
+  - name: Verificar estado de los servicios en Satellite Server con Hammer
+    ansible.builtin.command: hammer ping
+    register: hammer_ping_server
+    when: "'SATELLITE_SERVER' in group_names"
+    ignore_errors: true
+    failed_when: satellite_health_check_server.rc != 0
+
+  - name: Eliminar caracteres de control ANSI de la salida
+    set_fact:
+      satellite_service_list_clean: "{{ satellite_service_list_server.stdout | regex_replace('\u001b\\[.*?m', '') }}"
+    when: "'SATELLITE_SERVER' in group_names and satellite_service_list_server is defined"
+
+  - name: Exportar estado de los servicios del Satellite Server a archivo
+    delegate_to: localhost
+    ansible.builtin.lineinfile:
+      path: "inputs/salidas_satellite.adoc"
+      insertafter: EOF
+      line: |
+        {% if satellite_service_list_server is defined %}
+        == Estado de los servicios en Satellite Server
+
+        [source,bash]
+        ----
+        {{ satellite_service_list_server.stdout }}
+        ----
+        {% endif %}
+    when: "'SATELLITE_SERVER' in group_names and satellite_service_list_server is defined"
+
+  - name: Limpiar caracteres de control ANSI de la salida
+    ansible.builtin.set_fact:
+      cleaned_stdout: "{{ satellite_service_list_server.stdout | regex_replace('\u001b\\[.*?m', '') }}"
+    when: "'SATELLITE_SERVER' in group_names and satellite_service_list_server is defined"
+
+  - name: Verificar si todos los servicios están 'OK'
+    ansible.builtin.set_fact:
+      services_status_ok: "{{ '[OK]' in cleaned_stdout }}"
+    when: "'SATELLITE_SERVER' in group_names and cleaned_stdout is defined"
+
+  - name: Exportar estado de los servicios al archivo
+    delegate_to: localhost
+    ansible.builtin.lineinfile:
+      path: "inputs/salidas_satellite.adoc"
+      insertafter: EOF
+      line: |
+        === Estado de los servicios en Satellite Server
+
+        [source,bash]
+        ----
+        {% if services_status_ok %}
+        Todos los servicios están parecen estar operando correctamente.
+        {% else %}
+        Advertencia: Algunos servicios pueden no estar funcionando correctamente.
+        {% endif %}
+        ----
+    when: "'SATELLITE_SERVER' in group_names and services_status_ok is defined"
+
+  - name: Exportar chequeo de salud del Satellite Server a archivo
+    delegate_to: localhost
+    ansible.builtin.lineinfile:
+      path: "inputs/salidas_satellite.adoc"
+      insertafter: EOF
+      line: |
+        {% if satellite_health_check_server is defined %}
+        == Chequeo de salud en Satellite Server
+
+        [source,bash]
+        ----
+        {{ satellite_health_check_server.stdout }}
+        ----
+        {% if satellite_health_check_server.rc != 0 %}
+        === Resumen Chequeo de salud Satellite Server
+        Según los resultados del health check, algunos servicios están con problemas. Se sugiere aplicar `sudo satellite-maintain health check --assumeyes`
+        en la máquina para resolver estos problemas.
+        {% endif %}
+        {% endif %}
+    when: "'SATELLITE_SERVER' in group_names and satellite_health_check_server is defined"
+
+  - name: Exportar chequeo de hammer ping en Satellite Server
+    delegate_to: localhost
+    ansible.builtin.lineinfile:
+      path: "inputs/salidas_satellite.adoc"
+      insertafter: EOF
+      line: |
+        {% if hammer_ping_server is defined %}
+        == Respuesta de Hammer Ping en Satellite Server
+
+        [source,bash]
+        ----
+        {{ hammer_ping_server.stdout }}
+        ----
+        {% if hammer_ping_server.rc != 0 %}
+        === Servicios en estado de falla:
+        {% set lines = hammer_ping_server.stdout_lines %}
+        {% for i in range(lines|length) %}
+          {% if "FAIL" in lines[i] %}
+          Los siguientes servicios se encuentran en estado de error:
+          - {{ lines[i-1].strip() }}: {{ lines[i].strip() }}
+          {% endif %}
+        {% endfor %}
+        {% endif %}
+        {% endif %}
+    when: "'SATELLITE_SERVER' in group_names and hammer_ping_server is defined"
+
+  - name: Verificar información de CPU en Satellite Server
+    ansible.builtin.command: lscpu
+    register: lscpu_server
+    when: "'SATELLITE_SERVER' in group_names"
+
+  - name: Verificar RAM en Satellite Server
+    ansible.builtin.command: free -m
+    register: ram_server
+    when: "'SATELLITE_SERVER' in group_names"
+
+  - name: Verificar sistema de archivos en Satellite Server
+    ansible.builtin.shell: df -h | awk '$5 != "Use%" && substr($5, 1, length($5)-1) + 0 > {{ umbral_limite }} {print $1, $2, $5, $4}'
+    register: filesystem_server
+    when: "'SATELLITE_SERVER' in group_names"
+
+  - name: Establecer problemas_servidor_encontrados basado en la salida
+    delegate_to: localhost
+    ansible.builtin.set_fact:
+      problemas_servidor_encontrados: "{{ filesystem_server.stdout_lines | length > 0 }}"
+    when: "'SATELLITE_SERVER' in group_names"
+
+  - name: Guardar estado de problemas_servidor_encontrados en archivo temporal
+    ansible.builtin.copy:
+      dest: "/tmp/problemas_servidor_encontrados.txt"
+      content: "{{ problemas_servidor_encontrados }}"
+    delegate_to: localhost
+    when: "'SATELLITE_SERVER' in group_names"
+
+  - name: Exportar información de CPU de Satellite Server a archivo
+    delegate_to: localhost
+    ansible.builtin.lineinfile:
+      path: "inputs/salidas_satellite.adoc"
+      insertafter: EOF
+      line: |
+        == Información de CPU en {{  inventory_hostname  }}
+
+        [source,bash]
+        ----
+        {{ lscpu_server.stdout }}
+        ----
+    when: "'SATELLITE_SERVER' in group_names and lscpu_server is defined"
+
+  - name: Exportar información de RAM de Satellite Server a archivo
+    delegate_to: localhost
+    ansible.builtin.lineinfile:
+      path: "inputs/salidas_satellite.adoc"
+      insertafter: EOF
+      line: |
+        == Información de RAM en {{  inventory_hostname  }}
+
+        [source,bash]
+        ----
+        {{ ram_server.stdout }}
+        ----
+    when: "'SATELLITE_SERVER' in group_names and ram_server is defined"
+
+  - name: Exportar información del sistema de archivos de Satellite Server a archivo
+    delegate_to: localhost
+    ansible.builtin.lineinfile:
+      path: "inputs/salidas_satellite.adoc"
+      insertafter: EOF
+      line: |
+        == Información del sistema de archivos en {{  inventory_hostname  }}
+
+        [source,bash]
+        ----
+        {{ filesystem_server.stdout }}
+        ----
+
+        === Sistema de archivos con alto uso
+        {% set high_usage = [] %}
+        {% for line in filesystem_server.stdout_lines %}
+        {% set usage_percentage = line.split()[-2] | regex_replace('%','') | int %}
+        {% if usage_percentage > umbral_limite %}
+        {% set _ = high_usage.append(line) %}
+        {% endif %}
+        {% endfor %}
+        {% if high_usage %}
+        {% for line in high_usage %}
+        - {{ line.split()[0] }} tiene un {{ line.split()[-2] | regex_replace('%','') }}% de ocupación y {{ line.split()[-3] }} disponibles.
+        {% endfor %}
+        {% else %}
+        - No se encuentran sistemas de archivos superando el límite.
+        {% endif %}
+    when: "'SATELLITE_SERVER' in group_names and filesystem_server is defined"
+
+  - name: Exportar información del sistema de archivos de Satellite Server a archivo para adjuntar en correo
+    delegate_to: localhost
+    ansible.builtin.lineinfile:
+      path: "inputs/salidas_filesystem_server.html"
+      insertafter: EOF
+      line: |
+        <h3>Sistema de archivos con alto uso en {{  inventory_hostname  }}</h3>
+        {% set high_usage = [] %}
+        {% for line in filesystem_server.stdout_lines %}
+        {% set usage_percentage = line.split()[-2] | regex_replace('%','') | int %}
+        {% if usage_percentage > umbral_limite %}
+        {% set _ = high_usage.append(line) %}
+        {% endif %}
+        {% endfor %}
+        {% if high_usage %}
+        <ul>
+        {% for line in high_usage %}
+          <li>{{ line.split()[0] }} tiene un <span style="color: red;">{{ line.split()[-2] | regex_replace('%','') }}%</span> de ocupación y {{ line.split()[-3] }} disponibles</li>
+        {% endfor %}
+        </ul>
+        {% else %}
+        <p>No se encuentran sistemas de archivos superando el límite en {{  inventory_hostname  }}.</p>
+        {% endif %}
+    when: "'SATELLITE_SERVER' in group_names and filesystem_server is defined"
+
+  - name: Leer contenido del reporte de sistema de archivos del servidor
+    delegate_to: localhost
+    ansible.builtin.slurp:
+      src: "inputs/salidas_filesystem_server.html"
+    register: filesystem_server_content
+
+  - name: Decodificar contenido del reporte del servidor
+    ansible.builtin.set_fact:
+      server_report: "{{ filesystem_server_content['content'] | b64decode }}"
+
+  - name: Ejecutar y exportar comandos para Satellite CAPSULESs
+    when: "'SATELLITE_CAPSULES' in group_names"
+    block:
+      - name: Listar servicios en Satellite CAPSULES
+        ansible.builtin.command: sudo satellite-maintain service list
+        register: satellite_service_list_CAPSULES
+
+      - name: Ejecutar chequeo de salud en Satellite CAPSULES
+        ansible.builtin.command: sudo satellite-maintain health check
+        register: satellite_health_check_CAPSULES
+
+      - name: Eliminar caracteres de control ANSI de la salida
+        set_fact:
+          satellite_service_list_clean: "{{ satellite_service_list_CAPSULES.stdout | regex_replace('\u001b\\[.*?m', '') }}"
+        when: "'SATELLITE_CAPSULES' in group_names and satellite_service_list_CAPSULES is defined"
+
+      - name: Exportar estado de los servicios del Satellite CAPSULES a archivo
+        delegate_to: localhost
+        ansible.builtin.lineinfile:
+          path: "inputs/salidas_satellite.adoc"
+          insertafter: EOF
+          line: |
+            {% if satellite_service_list_CAPSULES is defined %}
+            == Estado de los servicios en {{  inventory_hostname  }}
+
+            [source,bash]
+            ----
+            {{ satellite_service_list_CAPSULES.stdout }}
+            ----
+            {% endif %}
+        when: "'SATELLITE_CAPSULES' in group_names and satellite_service_list_CAPSULES is defined"
+
+      - name: Limpiar caracteres de control ANSI de la salida
+        ansible.builtin.set_fact:
+          cleaned_stdout: "{{ satellite_service_list_CAPSULES.stdout | regex_replace('\u001b\\[.*?m', '') }}"
+        when: "'SATELLITE_CAPSULES' in group_names and satellite_service_list_CAPSULES is defined"
+
+      - name: Verificar si todos los servicios están 'OK'
+        ansible.builtin.set_fact:
+          services_status_ok: "{{ '[OK]' in cleaned_stdout }}"
+        when: "'SATELLITE_CAPSULES' in group_names and cleaned_stdout is defined"
+
+      - name: Exportar estado de los servicios al archivo
+        delegate_to: localhost
+        ansible.builtin.lineinfile:
+          path: "inputs/salidas_satellite.adoc"
+          insertafter: EOF
+          line: |
+            === Estado de los servicios en {{  inventory_hostname  }}
+
+            [source,bash]
+            ----
+            {% if services_status_ok %}
+            Todos los servicios están parecen estar operando correctamente.
+            {% else %}
+            Advertencia: Algunos servicios pueden no estar funcionando correctamente.
+            {% endif %}
+            ----
+        when: "'SATELLITE_CAPSULES' in group_names and services_status_ok is defined"
+
+      - name: Exportar chequeo de salud del Satellite CAPSULES a archivo
+        delegate_to: localhost
+        ansible.builtin.lineinfile:
+          path: "inputs/salidas_satellite.adoc"
+          insertafter: EOF
+          line: |
+            {% if satellite_health_check_CAPSULES is defined %}
+            == Chequeo de salud en Satellite {{  inventory_hostname  }}
+
+            [source,bash]
+            ----
+            {{ satellite_health_check_CAPSULES.stdout }}
+            ----
+            {% if satellite_health_check_CAPSULES.rc != 0 %}
+            === Resumen Chequeo de salud Satellite CAPSULES{{  inventory_hostname  }}
+            Según los resultados del health check, algunos servicios están con problemas. Se sugiere aplicar `sudo satellite-maintain health check --assumeyes`
+            en la máquina para resolver estos problemas.
+            {% endif %}
+            {% endif %}
+        when: "'SATELLITE_CAPSULES' in group_names and satellite_health_check_CAPSULES is defined"
+
+      - name: Verificar información de CPU en Satellite CAPSULES
+        ansible.builtin.command: lscpu
+        register: lscpu_CAPSULES
+        when: "'SATELLITE_CAPSULES' in group_names"
+
+      - name: Verificar RAM en Satellite CAPSULES
+        ansible.builtin.command: free -m
+        register: ram_CAPSULES
+        when: "'SATELLITE_CAPSULES' in group_names"
+
+      - name: Verificar sistema de archivos en Satellite CAPSULES
+        ansible.builtin.shell: df -h | awk '$5 != "Use%" && substr($5, 1, length($5)-1) + 0 > {{ umbral_limite }} {print $1, $2, $5, $4}'
+        register: filesystem_CAPSULES
+        when: "'SATELLITE_CAPSULES' in group_names"
+
+      - name: Establecer problemas_capsulas_encontrados basado en la salida
+        delegate_to: localhost
+        ansible.builtin.set_fact:
+          problemas_capsulas_encontrados: "{{ filesystem_CAPSULES.stdout_lines | length > 0 }}"
+        when: "'SATELLITE_CAPSULES' in group_names"
+
+      - name: Guardar estado de problemas_capsulas_encontrados en archivo temporal
+        ansible.builtin.copy:
+          dest: "/tmp/problemas_capsulas_encontrados.txt"
+          content: "{{ problemas_capsulas_encontrados }}"
+        delegate_to: localhost
+        when: "'SATELLITE_CAPSULES' in group_names"
+
+      - name: Exportar información de CPU de Satellite CAPSULES a archivo
+        delegate_to: localhost
+        ansible.builtin.lineinfile:
+          path: "inputs/salidas_satellite.adoc"
+          insertafter: EOF
+          line: |
+            == Información de CPU en Satellite {{  inventory_hostname  }}
+
+            [source,bash]
+            ----
+            {{ lscpu_CAPSULES.stdout }}
+            ----
+        when: "'SATELLITE_CAPSULES' in group_names and lscpu_CAPSULES is defined"
+
+      - name: Exportar información de RAM de Satellite CAPSULES a archivo
+        delegate_to: localhost
+        ansible.builtin.lineinfile:
+          path: "inputs/salidas_satellite.adoc"
+          insertafter: EOF
+          line: |
+            == Información de RAM en Satellite {{  inventory_hostname  }}
+
+            [source,bash]
+            ----
+            {{ ram_CAPSULES.stdout }}
+            ----
+        when: "'SATELLITE_CAPSULES' in group_names and ram_CAPSULES is defined"
+
+      - name: Exportar información del sistema de archivos de Satellite CAPSULES a archivo
+        delegate_to: localhost
+        ansible.builtin.lineinfile:
+          path: "inputs/salidas_satellite.adoc"
+          insertafter: EOF
+          line: |
+            == Información del sistema de archivos en {{  inventory_hostname  }}
+
+            [source,bash]
+            ----
+            {{ filesystem_CAPSULES.stdout }}
+            ----
+
+            === Sistema de archivos con alto uso en {{  inventory_hostname  }}
+            {% set high_usage = [] %}
+            {% for line in filesystem_CAPSULES.stdout_lines %}
+            {% set usage_percentage = line.split()[-2] | regex_replace('%','') | int %}
+            {% if usage_percentage > umbral_limite %}
+            {% set _ = high_usage.append(line) %}
+            {% endif %}
+            {% endfor %}
+            {% if high_usage %}
+            {% for line in high_usage %}
+            - {{ line.split()[0] }} tiene un {{ line.split()[-2] | regex_replace('%','') }}% de ocupación y {{ line.split()[-3] }} disponibles
+            {% endfor %}
+            {% else %}
+            - No se encuentran sistemas de archivos superando el límite.
+            {% endif %}
+        when: "'SATELLITE_CAPSULES' in group_names and filesystem_CAPSULES is defined"
+
+      - name: Exportar información del sistema de archivos de Satellite CAPSULES a archivo de correo
+        delegate_to: localhost
+        ansible.builtin.lineinfile:
+          path: "inputs/salidas_filesystem_capsules.html"
+          insertafter: EOF
+          line: |
+            <h3>Sistema de archivos con alto uso en {{ inventory_hostname }}</h3>
+            {% set high_usage = [] %}
+            {% for line in filesystem_CAPSULES.stdout_lines %}
+            {% set usage_percentage = line.split()[-2] | regex_replace('%','') | int %}
+            {% if usage_percentage > umbral_limite %}
+            {% set _ = high_usage.append(line) %}
+            {% endif %}
+            {% endfor %}
+            {% if high_usage %}
+            <ul>
+            {% for line in high_usage %}
+              <li>{{ line.split()[0] }} tiene un <span style="color: red;">{{ line.split()[-2] | regex_replace('%','') }}%</span> de ocupación y {{ line.split()[-3] }} Gigabytes disponibles</li>
+            {% endfor %}
+            </ul>
+            {% else %}
+            <p>No se encuentran sistemas de archivos superando el límite en {{ inventory_hostname }}.</p>
+            {% endif %}
+        when: "'SATELLITE_CAPSULES' in group_names and filesystem_CAPSULES is defined"
+
+  # Repetir las mismas tareas para Satellite CAPSULES
+
+  - name: Verificar información de CPU en Satellite CAPSULES
+    ansible.builtin.command: lscpu
+    register: lscpu_capsules
+    when: "'SATELLITE_CAPSULES' in group_names"
+
+  - name: Verificar RAM en Satellite CAPSULES
+    ansible.builtin.command: free -m
+    register: ram_capsules
+    when: "'SATELLITE_CAPSULES' in group_names"
+
+  - name: Exportar información de CPU de Satellite CAPSULES a archivo
+    delegate_to: localhost
+    ansible.builtin.lineinfile:
+      path: "inputs/salidas_satellite.adoc"
+      insertafter: EOF
+      line: |
+        == Información de CPU en Satellite CAPSULES {{ inventory_hostname }}
+
+        [source,bash]
+        ----
+        {{ lscpu_capsules.stdout }}
+        ----
+    when: "'SATELLITE_CAPSULES' in group_names and lscpu_capsules is defined"
+
+  - name: Exportar información de RAM de Satellite CAPSULES a archivo
+    delegate_to: localhost
+    ansible.builtin.lineinfile:
+      path: "inputs/salidas_satellite.adoc"
+      insertafter: EOF
+      line: |
+
+        == Información de RAM en Satellite CAPSULES {{ inventory_hostname }}
+
+        [source,bash]
+        ----
+        {{ ram_capsules.stdout }}
+        ----
+    when: "'SATELLITE_CAPSULES' in group_names and ram_capsules is defined"
+
+  - name: Exportar información del sistema de archivos de Satellite CAPSULES a archivo
+    delegate_to: localhost
+    ansible.builtin.lineinfile:
+      path: "inputs/salidas_satellite.adoc"
+      insertafter: EOF
+      line: |
+
+        == Información del sistema de archivos en Satellite CAPSULES {{ inventory_hostname }}
+
+        [source,bash]
+        ----
+        {{ filesystem_capsules.stdout }}
+        ----
+    when: "'SATELLITE_CAPSULES' in group_names and filesystem_capsules is defined"
+
+###########################################################
+#        Exportar informacion de Asciidoctor a PDF        #
+###########################################################
+
+- name: "Banco Pichincha :: Generar Healthcheck de RHS"
+  hosts: localhost
+  vars_files:
+    - vars/rhs_vars.yml
+  tasks:
+
+    - name: "Banco Pichincha :: Generar Healthcheck de Red Hat Satellite :: Exportar resultados a formato PDF desde Asciidoctor"
+      tags:
+        - always
+      ansible.builtin.shell: |
+        asciidoctor-pdf -d book \
+        -a pdf-theme="{{ playbook_dir }}/inputs/redhat-theme.yml" \
+        -a pdf-fontsdir="{{ playbook_dir }}/inputs/fonts" \
+        -D {{ playbook_dir }} "{{ playbook_dir }}/inputs/healthcheck_content.adoc" \
+        -o "/tmp/InformeRHSATELLITE_{{ fecha_ejecucion }}.pdf"
+      changed_when: false
+
+    - name: "Banco Pichincha :: Generar Healthcheck de Red Hat Satellite :: Exportar resultados a formato TXT desde Asciidoctor"
+      tags:
+        - always
+      ansible.builtin.shell: |
+        asciidoctor -b docbook \
+        -a pdf-theme="{{ playbook_dir }}/inputs/redhat-theme.yml" \
+        -a pdf-fontsdir="{{ playbook_dir }}/inputs/fonts" \
+        -D {{ playbook_dir }} "{{ playbook_dir }}/inputs/healthcheck_content.adoc" \
+        -o "/tmp/InformeRHSATELLITE_{{ fecha_ejecucion }}.txt"
+      changed_when: false
+
+    - name: Leer estado de problemas_servidor_encontrados desde archivo temporal
+      ansible.builtin.slurp:
+        src: "/tmp/problemas_servidor_encontrados.txt"
+      register: srv_problemas_content
+
+    - name: Leer estado de problemas_capsulas_encontrados desde archivo temporal
+      ansible.builtin.slurp:
+        src: "/tmp/problemas_capsulas_encontrados.txt"
+      register: caps_problemas_content
+
+    - name: Establecer variable basada en el contenido de problemas_servidor_encontrados
+      ansible.builtin.set_fact:
+        problemas_servidor_encontrados: "{{ srv_problemas_content['content'] | b64decode | trim | lower == 'true' }}"
+
+    - name: Establecer variable basada en el contenido de problemas_capsulas_encontrados
+      ansible.builtin.set_fact:
+        problemas_capsulas_encontrados: "{{ caps_problemas_content['content'] | b64decode | trim | lower == 'true' }}"
+
+    - name: Leer contenido del archivo HTML
+      ansible.builtin.slurp:
+        src: "inputs/salidas_filesystem_server.html"
+      register: html_content
+
+    - name: Decodificar el contenido HTML para su uso en el correo
+      ansible.builtin.set_fact:
+        html_body: "{{ html_content.content | b64decode }}"
+
+    - name: Leer contenido del archivo HTML de cápsulas
+      ansible.builtin.slurp:
+        src: "inputs/salidas_filesystem_capsules.html"
+      register: html_capsules_content
+
+    - name: Decodificar el contenido HTML de cápsulas para su uso en el correo
+      ansible.builtin.set_fact:
+        html_capsules_body: "{{ html_capsules_content.content | b64decode }}"
+
+    - name: Combinar el contenido HTML del servidor y las cápsulas
+      ansible.builtin.set_fact:
+        combined_html_body: "{{ html_body }}<hr>{{ html_capsules_body }}"
+
+    - name: Combinar el contenido HTML del servidor y las cápsulas con mensaje de alerta si es necesario
+      ansible.builtin.set_fact:
+        combined_html_body_with_alert: |
+          <p>Estimado Usuario,</p>
+          <p>Se ha generado un reporte de Healthcheck sobre la plataforma Red Hat Satellite, a continuación se exhiben los hallazgos:</p>
+          {% if problemas_servidor_encontrados or problemas_capsulas_encontrados %}
+          <p style="color: red;">Revise el informe adjunto porque se encontraron problemas en filesystems.</p>
+          {{ combined_html_body }}
+          {% else %}
+          <p>El informe de salud de Red Hat Satellite no ha identificado problemas críticos en filesystems.</p>
+          {% endif %}
+
+    - name: "Banco Pichincha :::  HC Satellite ::: Enviar mail con el reporte desde Ansible server"
+      run_once: true
+      when: send_email
+      tags:
+        - always
+      community.general.mail:
+        host: "{{ smtp_host }}"
+        port: "{{ smtp_port }}"
+        username: "{{ smtp_user | default(omit) }}"
+        password: "{{ smtp_pass | default(omit) }}"
+        from: "{{ mail_from }}"
+        to: "{{ mail_to }}"
+        subject: "Reporte Ansible DESA | Health Check Satellite | JobID {{ tower_job_id }}"
+        subtype: html
+        body: |
+          <p>Resumen de ejecución del <strong>Job ID {{ tower_job_id }}</strong>: </p>
+          <p><strong>Vea el archivo TXT adjunto para mas detalles</strong></p>
+          <p><i>Para consultar la salida completa  de la ejecución visite <a href="{{ job_url }}">{{ job_url }}</a></i></p>
+        attach:
+          - /tmp/InformeRHSATELLITE_{{ fecha_ejecucion }}.pdf
+          - /tmp/InformeRHSATELLITE_{{ fecha_ejecucion }}.txt

@@ -1,0 +1,25 @@
+trigger:
+  branches:
+    include:
+      - master
+      - develop
+      - feature/*
+  paths:
+# -----------------pipeline wont be triggered if there are changes on readme
+    exclude:
+      - README.md
+      - '**/README.md'
+# --------------------------------------------------
+resources:
+  repositories:
+    - repository: self
+    - repository: dvp-tpl-ansible
+      type: git
+      name: BP-DevOps-Infrastructure/dvp-tpl-ansible
+      ref: refs/heads/master
+
+variables:
+  - group: ans-prod-tower
+
+extends:
+  template: python/not/pip/init.yml@dvp-tpl-ansible

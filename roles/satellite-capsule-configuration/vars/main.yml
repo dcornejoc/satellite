@@ -1,0 +1,5 @@
+---
+lifecycle_environments:
+  - "DEV"
+  - "PROD"
+  - "TEST"

@@ -1,0 +1,4 @@
+---
+- name: Reiniciar servidor Red Hat Satellite si es requerido
+  ansible.builtin.reboot:
+...

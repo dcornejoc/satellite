@@ -1,0 +1,62 @@
+---
+- name: Creando inventario dinamico.
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Agregar inventory_hostname en grupo satellite_clients.
+      ansible.builtin.add_host:
+        name: "{{ item }}"
+        groups: satellite_clients
+      loop: "{{ satellite_client_name | split('\n') }}"
+      loop_control:
+        label: "Agregando nodo {{ item }} al grupo satellite_clients del inventario dinamico"
+
+- name: Ejecutando tareas en grupo dinamico satellite_clients
+  hosts: satellite_clients
+  gather_facts: false
+  become: true
+  tasks:
+    - name: Anulando suscripciones previas del host client.
+      community.general.redhat_subscription:
+        state: absent
+
+    - name: Instalar katello-ca-consumer desde Red Hat Satellite Server.
+      ansible.builtin.dnf:
+        name: "http://{{ satellite_capsule_fqdn }}/pub/katello-ca-consumer-latest.noarch.rpm"
+        state: present
+        disable_gpg_check: true
+
+    - name: Suscribiendo host usando activationkey y org_id.
+      community.general.redhat_subscription:
+        state: present
+        activationkey: "{{ satellite_capsule_activation_key }}"
+        org_id: "{{ satellite_capsule_org_id }}"
+
+    - name: Creando usuario satellite en host client para la ejecucion de tareas remotas.
+      ansible.builtin.user:
+        name: satellite
+        state: present
+
+    - name: Habilitando elevacion de privilegios para el usuario satellite.
+      ansible.builtin.copy:
+        content: "satellite ALL=(ALL) NOPASSWD:ALL"
+        dest: /etc/sudoers.d/satellite
+
+    - name: Agregar llave SSH publica del servidor Satellite al host client en el usuario satellite.
+      ansible.posix.authorized_key:
+        user: satellite
+        state: present
+        key: "https://{{ satellite_server_fqdn }}:9090/ssh/pubkey"
+        validate_certs: false
+      when:
+        - satellite_registration == "Satellite Server"
+
+    - name: Agregar llave SSH publica de la Capsula Satellite al host client en el usuario satellite.
+      ansible.posix.authorized_key:
+        user: satellite
+        state: present
+        key: "https://{{ satellite_capsule_fqdn }}:9090/ssh/pubkey"
+        validate_certs: false
+      when:
+        - satellite_registration == "Satellite Capsule" and satellite_capsule_fqdn is defined
+...

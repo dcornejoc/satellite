@@ -1,0 +1,76 @@
+- name: Obtener lista de todas las cápsulas
+  ansible.builtin.uri:
+    url: "{{ lookup('env', 'SATELLITE_SERVER_URL') }}/katello/api/capsules"
+    method: GET
+    user: "{{ lookup('env', 'SATELLITE_USERNAME') }}"
+    password: "{{ lookup('env', 'SATELLITE_PASSWORD') }}"
+    force_basic_auth: true
+    validate_certs: "{{ lookup('env', 'SATELLITE_VALIDATE_CERTS') }}"
+  register: all_capsules
+  loop: "{{ capsule_fqdn }}"
+  loop_control:
+    loop_var: current_capsule_fqdn
+    
+- name: Encontrar ID de la cápsula específica basada en la entrada parcial del FQDN del usuario
+  ansible.builtin.set_fact:
+    capsule_id: >
+      {{
+        (all_capsules.json.results | selectattr('name', 'search', current_capsule_fqdn) | first).id
+        | string | replace('\n', '') | replace('\r', '') | trim
+      }}
+  when: all_capsules.json.results is defined and
+    (all_capsules.json.results | selectattr('name', 'search', current_capsule_fqdn) | list | count) > 0
+
+- name: Obtener ambientes de ciclo de vida para la cápsula especificada
+  ansible.builtin.uri:
+    url: "{{ lookup('env', 'SATELLITE_SERVER_URL') }}/katello/api/capsules/{{ capsule_id }}/content/available_lifecycle_environments"
+    method: GET
+    user: "{{ lookup('env', 'SATELLITE_USERNAME') }}"
+    password: "{{ lookup('env', 'SATELLITE_PASSWORD') }}"
+    force_basic_auth: true
+    validate_certs: "{{ lookup('env', 'SATELLITE_VALIDATE_CERTS') }}"
+  register: lifecycle_envs_capsula
+  when: capsule_id is defined
+
+- name: Inicializar lista de environment_ids
+  ansible.builtin.set_fact:
+    environment_ids: []
+
+- name: Encontrar IDs de ambiente de ciclo de vida específico y agregarlos a la lista
+  ansible.builtin.set_fact:
+    environment_ids: >-
+      {{
+        environment_ids +
+        [
+          (
+            lifecycle_envs_capsula.json.results
+            | selectattr('name', 'equalto', item)
+            | map(attribute='id')
+            | first
+            | string
+            | replace('\n', '')
+            | replace('\r', '')
+            | trim
+          )
+        ]
+      }}
+  when:
+    - lifecycle_envs_capsula.json.results is defined
+    - (lifecycle_envs_capsula.json.results | selectattr('name', 'equalto', item) | map(attribute='id') | first) is not none
+  loop: "{{ lifecycle_environments[current_capsule_fqdn] }}"
+  loop_control:
+    loop_var: item
+
+- name: Asociar cada ambiente de ciclo de vida a la cápsula especificada
+  ansible.builtin.uri:
+    url: "{{ lookup('env', 'SATELLITE_SERVER_URL') }}/katello/api/capsules/{{ capsule_id }}/content/lifecycle_environments"
+    method: POST
+    user: "{{ lookup('env', 'SATELLITE_USERNAME') }}"
+    password: "{{ lookup('env', 'SATELLITE_PASSWORD') }}"
+    force_basic_auth: true
+    validate_certs: "{{ lookup('env', 'SATELLITE_VALIDATE_CERTS') }}"
+    body_format: json
+    body:
+      environment_id: "{{ item }}"
+  when: environment_ids | length > 0
+  loop: "{{ environment_ids }}"

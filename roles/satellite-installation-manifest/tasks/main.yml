@@ -1,0 +1,13 @@
+- name: Descargar manifiesto desde Red Hat Customer Portal.
+  delegate_to: localhost
+  redhat.satellite.redhat_manifest:
+    uuid: "{{ satellite_manifest_uuid }}"
+    username: "{{ RHSM_username }}"
+    password: "{{ RHSM_password }}"
+    path: "{{ satellite_manifest_path }}"
+- name: Cargar Subscription Manifest a la organizacion {{ satellite_organization }}.
+  delegate_to: localhost
+  redhat.satellite.subscription_manifest:
+    organization: "{{ satellite_organization }}"
+    manifest_path: "{{ satellite_manifest_path }}"
+    state: present

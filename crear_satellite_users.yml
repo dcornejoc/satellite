@@ -1,0 +1,31 @@
+---
+- name: Gestion de usuarios en Satellite.
+  hosts: localhost
+  gather_facts: False
+  become: False
+  collections:
+    - redhat.satellite
+  tasks:
+    - name: Crear o modificar usuario {{ satellite_username }} en Satellite.
+      when:
+        - satellite_user_action == "Crear"
+      redhat.satellite.user:
+        name: "{{ satellite_username }}"
+        firstname: "{{ satellite_user_first }}"
+        lastname: "{{ satellite_user_last }}"
+        mail: "{{ satellite_user_email }}"
+        description: "{{ satellite_user_first | default(omit) }} {{ satellite_user_last | default(omit) }}"
+        admin: "{{ satellite_admin_user | default(false) }}"
+        user_password: "{{ satellite_user_password }}"
+        auth_source: Internal
+        timezone: "{{ satellite_user_timezone | default(omit) }}"
+        state: present
+        roles: "{{ satellite_user_roles }}"
+    
+    - name: Borrando usuario {{ satellite_username }} en Satellite.
+      when:
+        - satellite_user_action == "Borrar"
+      redhat.satellite.user:
+        name: "{{ satellite_username }}"
+        state: absent
+...

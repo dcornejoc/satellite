@@ -1,0 +1,166 @@
+---
+# tasks file for satellite-capsule
+- name: Ejecutando tareas en satellite server
+  when:
+    - inventory_hostname in groups['SATELLITE_SERVER']
+  block:
+    - name: Generando directorio para certificados de Satellite Capsule en {{ satellite_server_fqdn }}
+      ansible.builtin.file:
+        path: /root/capsule_cert
+        state: directory
+
+    - name: Generando certificados para las Capsulas de satellite
+      ansible.builtin.shell: >
+        capsule-certs-generate \
+        --foreman-proxy-fqdn {{ item }} \
+        --certs-tar {{ item }}-certs.tar --no-colors > /root/{{ item }}-capsule_result.sh
+      args:
+        chdir: /root/capsule_cert
+      register: comando_capsule_result
+      loop: "{{ groups['SATELLITE_CAPSULE_PROD'] }}"
+
+    - name: Descargando certificado de Satellite Capsule en localhost.
+      ansible.builtin.fetch:
+        src: "/root/capsule_cert/{{ item }}-certs.tar"
+        dest: "/tmp/{{ item }}-certs.tar"
+        flat: true
+      loop: "{{ groups['SATELLITE_CAPSULE_PROD'] }}"
+
+    - name: Descargando fichero installation de Satellite Capsule en localhost.
+      ansible.builtin.fetch:
+        src: /root/{{ item }}-capsule_result.sh
+        dest: /tmp/{{ item }}-capsule_result.sh
+        flat: true
+      loop: "{{ groups['SATELLITE_CAPSULE_PROD'] }}"
+
+- name: Block de ejecucion capsule server.
+  when:
+    - inventory_hostname in groups['SATELLITE_CAPSULE_PROD']
+  block:
+    - name: Copiando certificado de Satellite Capsule
+      ansible.builtin.copy:
+        src: "/tmp/{{ inventory_hostname }}-certs.tar"
+        dest: "/root/{{ inventory_hostname }}-certs.tar"
+
+    - name: Copiando script de configuracion.
+      ansible.builtin.copy:
+        src: "/tmp/{{ inventory_hostname }}-capsule_result.sh"
+        dest: "/root/{{ inventory_hostname }}-capsule_result.sh"
+
+    - name: Instalar katello-ca-consumer desde Red Hat Satellite Server.
+      ansible.builtin.dnf:
+        name: "http://{{ satellite_server_fqdn }}/pub/katello-ca-consumer-latest.noarch.rpm"
+        state: present
+        disable_gpg_check: true
+
+    - name: Registrando servidor Red Hat Satellite Capsule usando activationkey y org_id.
+      community.general.redhat_subscription:
+        state: present
+        activationkey: "{{ satellite_capsule_prod_activation_key }}"
+        org_id: "{{ satellite_capsule_org_id }}"
+
+    - name: Deshabilitar todos los repositorios activos.
+      community.general.rhsm_repository:
+        name: '*'
+        state: disabled
+
+    - name: Habilitar repositorios requeridos desde Red Hat Satellite Server.
+      community.general.rhsm_repository:
+        name:
+          - rhel-8-for-x86_64-baseos-rpms
+          - rhel-8-for-x86_64-appstream-rpms
+          - "satellite-capsule-{{ satellite_version }}-for-rhel-8-x86_64-rpms"
+          - "satellite-maintenance-{{ satellite_version }}-for-rhel-8-x86_64-rpms"
+        state: enabled
+
+    - name: Habilitar modulo satellite-capsule:el8.
+      ansible.builtin.command:
+        cmd: dnf module enable satellite-capsule:el8 -y
+
+    - name: Actualizar todos los paquetes del sistema.
+      ansible.builtin.dnf:
+        name: "*"
+        state: latest
+      register: update_system
+
+    - name: Reiniciar servidor Red Hat Satellite Capsule si es requerido.
+      ansible.builtin.reboot:
+      when: update_system['changed']
+
+    - name: Instalar paquete satellite en servidor Red Hat Satellite Capsule.
+      ansible.builtin.dnf:
+        name: satellite-capsule
+        state: present
+
+    - name: Instalando paquetes chrony y sos en servidor Red Hat Satellite Capsule.
+      ansible.builtin.dnf:
+        name: "{{ satellite_capsule_pre_pkgs }}"
+        state: latest
+
+    - name: Iniciando servicio chronyd en servidor Red Hat Satellite Capsule.
+      ansible.builtin.service:
+        name: chronyd
+        state: started
+        enabled: true
+
+    - name: Establecer zona horaria del servidor Red Hat Satellite Capsule.
+      community.general.timezone:
+        name: "{{ satellite_capsule_timezone }}"
+
+    - name: Obtener lineas de ejecucion de comando satellite-installer.
+      ansible.builtin.command:
+        cmd: "tail -n 9 /root/{{ inventory_hostname }}-capsule_result.sh"
+      register: satellite_capsule_installer
+      changed_when: satellite_capsule_installer['rc'] == 0
+
+    - name: Creando script satellite-capsule-installer.
+      ansible.builtin.copy:
+        content: |
+          #!/bin/bash
+          {{ satellite_capsule_installer['stdout'] }} --no-colors
+        dest: /root/satellite-capsule-installer.sh
+        mode: "0755"
+
+    - name: Ejecutando script satellite-capsule-installer.
+      ansible.builtin.shell: /root/satellite-capsule-installer.sh
+      register: capsule_installer_result
+
+    - name: Obtener resultado de la configuracion en servidor Red Hat Satellite Capsule.
+      ansible.builtin.debug:
+        var: capsule_installer_result['stdout_lines']
+
+    - name: Habilitar puertos requeridos en firewalld.
+      ansible.posix.firewalld:
+        port: "{{ item }}"
+        permanent: true
+        state: enabled
+        immediate: true
+      loop: "{{ satellite_capsule_fw_ports }}"
+      loop_control:
+        label: "Habilitando puerto {{ item }} en firewalld."
+
+    - name: Estableciendo permisos ACL para el usuario apache en /var/www/html/pub/
+      ansible.posix.acl:
+        path: /var/www/html/pub/
+        entity: apache
+        etype: user
+        permissions: r--
+        state: present
+        default: yes        
+
+    - name: Buscar todos los archivos y directorios en /var/www/html/pub/
+      ansible.builtin.find:
+        paths: /var/www/html/pub/
+        recurse: yes
+        file_type: any
+      register: archivos_directorios
+    
+    - name: Aplicando permisos ACL para el usuario apache a todos los archivos y directorios encontrados
+      ansible.posix.acl:
+        path: "{{ item.path }}"
+        entity: apache
+        etype: user
+        permissions: r--
+        state: present
+      loop: "{{ archivos_directorios.files }}"      
+...

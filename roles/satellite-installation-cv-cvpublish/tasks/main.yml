@@ -1,0 +1,28 @@
+---
+- name: Crear o actualizar content views para cada entorno
+  delegate_to: localhost
+  redhat.satellite.content_view:
+    name: "{{ item.name }}"
+    organization: "{{ satellite_organization }}"
+    repositories: "{{ item.repositories }}"
+    composite: false
+  loop: "{{ satellite_cv_definition }}"
+  loop_control:
+    label: "Creando content view {{ item.name }} con repositorios habilitados"
+  ignore_errors: true
+
+
+
+- name: Publicar cada content view en Satellite en la organización {{ satellite_organization }}
+  delegate_to: localhost
+  redhat.satellite.content_view_version:
+    content_view: "{{ item.name }}"
+    organization: "{{ satellite_organization }}"
+    version: "{{ satellite_cv_version | default(omit) }}"
+    lifecycle_environments: "{{ item.lifecycle_environments }}"
+    state: present
+    force_promote: true
+  loop: "{{ satellite_cv_definition }}"
+  loop_control:
+    label: "Publicando content view {{ item.name }}"
+  ignore_errors: true    

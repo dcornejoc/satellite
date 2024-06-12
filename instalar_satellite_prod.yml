@@ -1,0 +1,32 @@
+---
+- name: Instalando nuevo servidor Red Hat Satellite.
+  hosts: SATELLITE_SERVER
+  become: true
+  pre_tasks:
+    - name: Validando requerimientos de hardware del servidor Red Hat Satellite.
+      ansible.builtin.fail:
+        msg: |
+          El servidor {{ inventory_hostname }} NO cumple los requerimientos minimos para instalar Red Hat Satellite.
+          Por favor establezca los requerimientos minimos y vuelva a ejecutar la instalacion.
+      when: 
+        - ansible_facts['processor_vcpus'] < 4 or
+          ansible_facts['memtotal_mb'] < 19773
+      
+    - name: Validando registro DNS del servidor Red Hat Satellite.
+      ansible.builtin.fail:
+        msg: |
+          El servidor {{ inventory_hostname }} NO resuelve por DNS valido.
+          Por favor compruebe el servidor DNS establecido en el servidor Red Hat Satellite.
+      when:
+        - lookup('community.general.dig', ansible_facts['fqdn']) != ansible_facts['default_ipv4']['address']
+
+  roles:
+    - role: satellite-server
+    - role: satellite-installation-orgs
+    - role: satellite-locations
+    - role: satellite-installation-manifest
+    - role: satellite-installlation-repos
+    - role: satellite-installation-sync-plans
+    - role: satellite-lifeceycle-environment
+    - role: satellite-installation-cv-cvpublish
+    - role: satellite-installation-act-keys

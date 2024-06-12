@@ -1,0 +1,581 @@
+---
+satellite_organization: "Banco Pichincha"
+satellite_activation_key_definitions:
+  - name: "ack-cv-Library"
+    content_view: "Library"
+    lifecycle_environments: ["Library", "DEV", "TEST", "PROD"]
+  - name: "ack-cv-RHDS10-RHEL7"
+    content_view: "cv-RHDS10-RHEL7"
+    lifecycle_environments: ["Library", "DEV", "TEST", "PROD"]
+  - name: "ack-cv-RHDS11-RHEL8"
+    content_view: "cv-RHDS11-RHEL8"
+    lifecycle_environments: ["Library", "DEV", "TEST", "PROD"]
+  - name: "ack-cv-Rhel7-Rhocp"
+    content_view: "cv-Rhel7-Rhocp"
+    lifecycle_environments: ["Library", "DEV", "TEST", "PROD"]
+  - name: "ack-cv-Rhel8-Rhansibleap"
+    content_view: "cv-Rhel8-Rhansibleap"
+    lifecycle_environments: ["Library", "DEV", "TEST", "PROD"]
+  - name: "ack-cv-rhansibleap"
+    content_view: "cv-rhansibleap"
+    lifecycle_environments: ["Library", "DEV", "TEST", "PROD"]
+  - name: "ack-cv-rhds10-for-rhel7"
+    content_view: "cv-rhds10-for-rhel7"
+    lifecycle_environments: ["Library", "DEV", "TEST", "PROD"]
+  - name: "ack-cv-rhds11-for-rhel8"
+    content_view: "cv-rhds11-for-rhel8"
+    lifecycle_environments: ["Library", "DEV", "TEST", "PROD"]
+  - name: "ack-cv-rhel7"
+    content_view: "cv-rhel7"
+    lifecycle_environments: ["Library", "DEV", "TEST", "PROD"]
+  - name: "ack-cv-rhel74"
+    content_view: "cv-rhel74"
+    lifecycle_environments: ["Library", "DEV", "TEST", "PROD"]
+  - name: "ack-cv-rhel76"
+    content_view: "cv-rhel76"
+    lifecycle_environments: ["Library", "DEV", "TEST", "PROD"]
+  - name: "ack-cv-rhel77"
+    content_view: "cv-rhel77"
+    lifecycle_environments: ["Library", "DEV", "TEST", "PROD"]
+  - name: "ack-cv-rhel78"
+    content_view: "cv-rhel78"
+    lifecycle_environments: ["Library", "DEV", "TEST", "PROD"]
+  - name: "ack-cv-rhel8"
+    content_view: "cv-rhel8"
+    lifecycle_environments: ["Library", "DEV", "TEST", "PROD"]
+  - name: "ack-cv-rhel81"
+    content_view: "cv-rhel81"
+    lifecycle_environments: ["Library", "DEV", "TEST", "PROD"]
+  - name: "ack-cv-rhel82"
+    content_view: "cv-rhel82"
+    lifecycle_environments: ["Library", "DEV", "TEST", "PROD"]
+  - name: "ack-cv-rhel84"
+    content_view: "cv-rhel84"
+    lifecycle_environments: ["Library", "DEV", "TEST", "PROD"]
+  - name: "ack-cv-rhel86"
+    content_view: "cv-rhel86"
+    lifecycle_environments: ["Library", "DEV", "TEST", "PROD"]
+  - name: "ack-cv-rhel88"
+    content_view: "cv-rhel88"
+    lifecycle_environments: ["Library", "DEV", "TEST", "PROD"]
+  - name: "ack-cv-Rhel8-Rhocp4"
+    content_view: "cv-Rhel8-Rhocp4"
+    lifecycle_environments: ["Library", "DEV", "TEST", "PROD"]
+  - name: "ack-cv-rhel9"
+    content_view: "cv-rhel9"
+    lifecycle_environments: ["Library", "DEV", "TEST", "PROD"]
+  - name: "ack-cv-rhocp"
+    content_view: "cv-rhocp"
+    lifecycle_environments: ["Library", "DEV", "TEST", "PROD"]
+  - name: "ack-cv-rhocp4"
+    content_view: "cv-rhocp4"
+    lifecycle_environments: ["Library", "DEV", "TEST", "PROD"]
+  - name: "ack-cv-satellite-capsule-rhel8"
+    content_view: "cv-satellite-capsule-rhel8"
+    lifecycle_environments: ["Library", "DEV", "TEST", "PROD"]
+
+repo_labels:
+
+  Library:
+    - label: satellite-client-6-for-rhel-8-x86_64-rpms
+      override: enabled       
+    - label: satellite-client-6-for-rhel-9-x86_64-rpms
+      override: enabled   
+    - label: ansible-2.9-for-rhel-8-aarch64-rpms
+      override: enabled
+    - label: ansible-2.9-for-rhel-8-ppc64le-rpms
+      override: enabled
+    - label: rhel-7-server-ansible-2.9-rpms
+      override: enabled
+    - label: rhel-7-server-ansible-2.9-source-rpms
+      override: enabled
+    - label: rhel-7-server-rhds-10-debug-rpms
+      override: enabled
+    - label: rhel-7-server-rhds-10-isos
+      override: enabled
+    - label: rhel-7-server-rhds-10-rpms
+      override: enabled
+    - label: rhel-7-server-rhds-10-source-rpms
+      override: enabled
+    - label: dirsrv-11-for-rhel-8-x86_64-rpms
+      override: enabled
+    - label: dirsrv-11-for-rhel-8-x86_64-source-rpms
+      override: enabled
+    - label: rhel-7-server-rpms
+      override: enabled
+    - label: rhel-7-server-ose-3.11-rpms
+      override: enabled
+    - label: rhel-7-server-ose-3.11-source-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-appstream-debug-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-appstream-kickstart
+      override: enabled
+    - label: rhel-8-for-x86_64-appstream-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-appstream-source-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-baseos-debug-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-baseos-isos
+      override: enabled
+    - label: rhel-8-for-x86_64-baseos-kickstart
+      override: enabled
+    - label: rhel-8-for-x86_64-baseos-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-baseos-source-isos
+      override: enabled
+    - label: rhel-8-for-x86_64-baseos-source-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-supplementary-debug-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-supplementary-isos
+      override: enabled
+    - label: rhel-8-for-x86_64-supplementary-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-supplementary-source-rpms
+      override: enabled
+    - label: satellite-client-6-for-rhel-8-x86_64-rpms
+      override: enabled
+    - label: satellite-client-6-for-rhel-9-x86_64-rpms
+      override: enabled
+    - label: satellite-maintenance-6.15-for-rhel-8-x86_64-rpms
+      override: enabled
+    - label: satellite-utils-6-beta-for-rhel-8-x86_64-source-rpms
+      override: enabled
+    - label: ansible-automation-platform-2.0-early-access-for-rhel-8-x86_64-rpms
+      override: enabled
+    - label: ansible-automation-platform-2.1-for-rhel-8-x86_64-rpms
+      override: enabled
+    - label: ansible-automation-platform-2.4-for-rhel-8-x86_64-rpms
+      override: enabled
+    - label: automation-hub-4.2-for-rhel-8-x86_64-rpms
+      override: enabled
+    - label: automation-services-catalog-1-tech-preview-for-rhel-8-x86_64-rpms
+      override: enabled
+    - label: rhocp-4.11-for-rhel-8-x86_64-rpms
+      override: enabled
+    - label: rhocp-4.11-for-rhel-8-x86_64-source-rpms
+      override: enabled
+    - label: rhel-9-for-x86_64-appstream-debug-rpms
+      override: enabled
+    - label: rhel-9-for-x86_64-appstream-kickstart
+      override: enabled
+    - label: rhel-9-for-x86_64-appstream-rpms
+      override: enabled
+    - label: rhel-9-for-x86_64-appstream-source-rpms
+      override: enabled
+    - label: rhel-9-for-x86_64-baseos-debug-rpms
+      override: enabled
+    - label: rhel-9-for-x86_64-baseos-isos
+      override: enabled
+    - label: rhel-9-for-x86_64-baseos-kickstart
+      override: enabled
+    - label: rhel-9-for-x86_64-baseos-rpms
+      override: enabled
+    - label: rhel-9-for-x86_64-baseos-source-isos
+      override: enabled
+    - label: rhel-9-for-x86_64-baseos-source-rpms
+      override: enabled
+    - label: rhel-9-for-x86_64-supplementary-debug-rpms
+      override: enabled
+    - label: rhel-9-for-x86_64-supplementary-rpms
+      override: enabled
+    - label: rhel-9-for-x86_64-supplementary-source-rpms
+      override: enabled
+    - label: satellite-client-6-for-rhel-9-x86_64-rpms
+      override: enabled
+  cv-rhansibleap:
+    - label: satellite-client-6-for-rhel-8-x86_64-rpms
+      override: enabled       
+    - label: rhel-8-for-x86_64-appstream-debug-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-appstream-kickstart
+      override: enabled    
+    - label: ansible-2.9-for-rhel-8-aarch64-rpms
+      override: enabled
+    - label: ansible-2.9-for-rhel-8-ppc64le-rpms
+      override: enabled
+    - label: rhel-7-server-ansible-2.9-rpms
+      override: enabled
+    - label: rhel-7-server-ansible-2.9-source-rpms
+      override: enabled
+  cv-rhds10-for-rhel7:
+    - label: rhel-7-server-rhds-10-debug-rpms
+      override: enabled
+    - label: rhel-7-server-rhds-10-isos
+      override: enabled
+    - label: rhel-7-server-rhds-10-rpms
+      override: enabled
+    - label: rhel-7-server-rhds-10-source-rpms
+      override: enabled
+  cv-RHDS10-RHEL7:
+    - label: rhel-7-server-rhds-10-debug-rpms
+      override: enabled
+    - label: rhel-7-server-rhds-10-isos
+      override: enabled
+    - label: rhel-7-server-rhds-10-rpms
+      override: enabled
+    - label: rhel-7-server-rhds-10-source-rpms
+      override: enabled
+  cv-rhds11-for-rhel8:
+    - label: satellite-client-6-for-rhel-8-x86_64-rpms
+      override: enabled       
+    - label: rhel-8-for-x86_64-appstream-debug-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-appstream-kickstart
+      override: enabled  
+    - label: dirsrv-11-for-rhel-8-x86_64-rpms
+      override: enabled
+    - label: dirsrv-11-for-rhel-8-x86_64-source-rpms
+      override: enabled
+  cv-RHDS11-RHEL8:
+    - label: dirsrv-11-for-rhel-8-x86_64-rpms
+      override: enabled
+    - label: dirsrv-11-for-rhel-8-x86_64-source-rpms
+      override: enabled
+  cv-rhel7:
+    - label: rhel-7-server-rpms
+      override: enabled
+  cv-rhel74:
+    - label: rhel-7-server-rpms
+      override: enabled
+  cv-rhel76:
+    - label: rhel-7-server-rpms
+      override: enabled
+  cv-rhel77:
+    - label: rhel-7-server-rpms
+      override: enabled
+  cv-rhel78:
+    - label: rhel-7-server-rpms
+      override: enabled
+  cv-Rhel7-Rhocp:
+    - label: rhel-7-server-ose-3.11-rpms
+      override: enabled
+    - label: rhel-7-server-ose-3.11-source-rpms
+      override: enabled
+  cv-rhel8:
+    - label: satellite-client-6-for-rhel-8-x86_64-rpms
+      override: enabled     
+    - label: rhel-8-for-x86_64-appstream-debug-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-appstream-kickstart
+      override: enabled
+    - label: rhel-8-for-x86_64-appstream-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-appstream-source-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-baseos-debug-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-baseos-isos
+      override: enabled
+    - label: rhel-8-for-x86_64-baseos-kickstart
+      override: enabled
+    - label: rhel-8-for-x86_64-baseos-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-baseos-source-isos
+      override: enabled
+    - label: rhel-8-for-x86_64-baseos-source-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-supplementary-debug-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-supplementary-isos
+      override: enabled
+    - label: rhel-8-for-x86_64-supplementary-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-supplementary-source-rpms
+      override: enabled
+    - label: satellite-client-6-for-rhel-8-x86_64-rpms
+      override: enabled
+    - label: satellite-client-6-for-rhel-9-x86_64-rpms
+      override: enabled
+    - label: satellite-maintenance-6.15-for-rhel-8-x86_64-rpms
+      override: enabled
+    - label: satellite-utils-6-beta-for-rhel-8-x86_64-source-rpms
+      override: enabled
+  cv-rhel81:
+    - label: satellite-client-6-for-rhel-8-x86_64-rpms
+      override: enabled     
+    - label: rhel-8-for-x86_64-appstream-debug-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-appstream-kickstart
+      override: enabled
+    - label: rhel-8-for-x86_64-appstream-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-appstream-source-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-baseos-debug-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-baseos-isos
+      override: enabled
+    - label: rhel-8-for-x86_64-baseos-kickstart
+      override: enabled
+    - label: rhel-8-for-x86_64-baseos-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-baseos-source-isos
+      override: enabled
+    - label: rhel-8-for-x86_64-baseos-source-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-supplementary-debug-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-supplementary-isos
+      override: enabled
+    - label: rhel-8-for-x86_64-supplementary-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-supplementary-source-rpms
+      override: enabled
+  cv-rhel82:
+    - label: satellite-client-6-for-rhel-8-x86_64-rpms
+      override: enabled     
+    - label: rhel-8-for-x86_64-appstream-debug-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-appstream-kickstart
+      override: enabled
+    - label: rhel-8-for-x86_64-appstream-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-appstream-source-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-baseos-debug-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-baseos-isos
+      override: enabled
+    - label: rhel-8-for-x86_64-baseos-kickstart
+      override: enabled
+    - label: rhel-8-for-x86_64-baseos-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-baseos-source-isos
+      override: enabled
+    - label: rhel-8-for-x86_64-baseos-source-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-supplementary-debug-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-supplementary-isos
+      override: enabled
+    - label: rhel-8-for-x86_64-supplementary-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-supplementary-source-rpms
+      override: enabled
+  cv-rhel84:
+    - label: satellite-client-6-for-rhel-8-x86_64-rpms
+      override: enabled     
+    - label: rhel-8-for-x86_64-appstream-debug-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-appstream-kickstart
+      override: enabled
+    - label: rhel-8-for-x86_64-appstream-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-appstream-source-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-baseos-debug-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-baseos-isos
+      override: enabled
+    - label: rhel-8-for-x86_64-baseos-kickstart
+      override: enabled
+    - label: rhel-8-for-x86_64-baseos-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-baseos-source-isos
+      override: enabled
+    - label: rhel-8-for-x86_64-baseos-source-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-supplementary-debug-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-supplementary-isos
+      override: enabled
+    - label: rhel-8-for-x86_64-supplementary-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-supplementary-source-rpms
+      override: enabled
+  cv-rhel86:
+    - label: satellite-client-6-for-rhel-8-x86_64-rpms
+      override: enabled     
+    - label: rhel-8-for-x86_64-appstream-debug-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-appstream-kickstart
+      override: enabled
+    - label: rhel-8-for-x86_64-appstream-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-appstream-source-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-baseos-debug-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-baseos-isos
+      override: enabled
+    - label: rhel-8-for-x86_64-baseos-kickstart
+      override: enabled
+    - label: rhel-8-for-x86_64-baseos-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-baseos-source-isos
+      override: enabled
+    - label: rhel-8-for-x86_64-baseos-source-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-supplementary-debug-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-supplementary-isos
+      override: enabled
+    - label: rhel-8-for-x86_64-supplementary-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-supplementary-source-rpms
+      override: enabled
+  cv-rhel88:
+    - label: satellite-client-6-for-rhel-8-x86_64-rpms
+      override: enabled       
+    - label: rhel-8-for-x86_64-appstream-debug-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-appstream-kickstart
+      override: enabled
+    - label: rhel-8-for-x86_64-appstream-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-appstream-source-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-baseos-debug-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-baseos-isos
+      override: enabled
+    - label: rhel-8-for-x86_64-baseos-kickstart
+      override: enabled
+    - label: rhel-8-for-x86_64-baseos-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-baseos-source-isos
+      override: enabled
+    - label: rhel-8-for-x86_64-baseos-source-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-supplementary-debug-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-supplementary-isos
+      override: enabled
+    - label: rhel-8-for-x86_64-supplementary-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-supplementary-source-rpms
+      override: enabled
+  cv-Rhel8-Rhansibleap:
+    - label: rhel-8-for-x86_64-appstream-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-baseos-rpms
+      override: enabled
+    - label: satellite-client-6-for-rhel-8-x86_64-rpms
+      override: enabled       
+    - label: ansible-automation-platform-2.0-early-access-for-rhel-8-x86_64-rpms
+      override: enabled
+    - label: ansible-automation-platform-2.1-for-rhel-8-x86_64-rpms
+      override: enabled
+    - label: ansible-automation-platform-2.4-for-rhel-8-x86_64-rpms
+      override: enabled
+    - label: automation-hub-4.2-for-rhel-8-x86_64-rpms
+      override: enabled
+    - label: automation-services-catalog-1-tech-preview-for-rhel-8-x86_64-rpms
+      override: enabled
+  cv-Rhel8-Rhocp4:
+    - label: rhel-8-for-x86_64-appstream-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-baseos-rpms
+      override: enabled
+    - label: satellite-client-6-for-rhel-8-x86_64-rpms
+      override: enabled       
+    - label: rhel-7-server-ose-3.11-rpms
+      override: enabled
+    - label: rhel-7-server-ose-3.11-source-rpms
+      override: enabled
+    - label: rhocp-4.11-for-rhel-8-x86_64-rpms
+      override: enabled
+    - label: rhocp-4.11-for-rhel-8-x86_64-source-rpms
+      override: enabled
+  cv-rhel9:
+    - label: satellite-client-6-for-rhel-9-x86_64-rpms
+      override: enabled       
+    - label: rhel-8-for-x86_64-appstream-debug-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-appstream-kickstart
+      override: enabled
+    - label: rhel-8-for-x86_64-appstream-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-appstream-source-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-baseos-debug-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-baseos-isos
+      override: enabled
+    - label: rhel-8-for-x86_64-baseos-kickstart
+      override: enabled
+    - label: rhel-8-for-x86_64-baseos-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-baseos-source-isos
+      override: enabled
+    - label: rhel-8-for-x86_64-baseos-source-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-supplementary-debug-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-supplementary-isos
+      override: enabled
+    - label: rhel-8-for-x86_64-supplementary-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-supplementary-source-rpms
+      override: enabled
+    - label: rhel-9-for-x86_64-appstream-debug-rpms
+      override: enabled
+    - label: rhel-9-for-x86_64-appstream-kickstart
+      override: enabled
+    - label: rhel-9-for-x86_64-appstream-rpms
+      override: enabled
+    - label: rhel-9-for-x86_64-appstream-source-rpms
+      override: enabled
+    - label: rhel-9-for-x86_64-baseos-debug-rpms
+      override: enabled
+    - label: rhel-9-for-x86_64-baseos-isos
+      override: enabled
+    - label: rhel-9-for-x86_64-baseos-kickstart
+      override: enabled
+    - label: rhel-9-for-x86_64-baseos-rpms
+      override: enabled
+    - label: rhel-9-for-x86_64-baseos-source-isos
+      override: enabled
+    - label: rhel-9-for-x86_64-baseos-source-rpms
+      override: enabled
+    - label: rhel-9-for-x86_64-supplementary-debug-rpms
+      override: enabled
+    - label: rhel-9-for-x86_64-supplementary-rpms
+      override: enabled
+    - label: rhel-9-for-x86_64-supplementary-source-rpms
+      override: enabled
+    - label: satellite-client-6-for-rhel-9-x86_64-rpms
+      override: enabled
+  cv-rhocp:
+    - label: rhel-7-server-ose-3.11-rpms
+      override: enabled
+    - label: rhel-7-server-ose-3.11-source-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-appstream-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-baseos-rpms
+      override: enabled
+    - label: satellite-client-6-for-rhel-8-x86_64-rpms
+      override: enabled      
+    - label: rhocp-4.11-for-rhel-8-x86_64-rpms
+      override: enabled
+    - label: rhocp-4.11-for-rhel-8-x86_64-source-rpms      
+  cv-rhocp4:
+    - label: rhel-8-for-x86_64-appstream-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-baseos-rpms
+      override: enabled
+    - label: satellite-client-6-for-rhel-8-x86_64-rpms
+      override: enabled       
+    - label: rhel-8-for-x86_64-appstream-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-baseos-rpms
+      override: enabled  
+    - label: rhocp-4.11-for-rhel-8-x86_64-rpms
+      override: enabled
+    - label: rhocp-4.11-for-rhel-8-x86_64-source-rpms
+      override: enabled
+  cv-satellite-capsule-rhel8:
+    - label: rhel-8-for-x86_64-appstream-rpms
+      override: enabled
+    - label: rhel-8-for-x86_64-baseos-rpms
+      override: enabled
+    - label: satellite-6.15-for-rhel-8-x86_64-rpms
+      override: enabled
+    - label: satellite-capsule-6.15-for-rhel-8-x86_64-rpms
+      override: enabled
+    - label: satellite-maintenance-6.15-for-rhel-8-x86_64-rpms
+      override: enabled

@@ -1,0 +1,17 @@
+---
+- name: Crear Activation Keys y asociar con Content Views en Satellite
+  delegate_to: localhost
+  no_log: False
+  redhat.satellite.activation_key:
+    name: "{{ item.0.name }}-{{ env }}"
+    organization: "{{ satellite_organization }}"
+    lifecycle_environment: "{{ env }}"
+    content_view: "{{ item.0.content_view }}"
+    content_overrides: "{{ repo_labels[item.0.content_view] }}"
+  loop: "{{ satellite_activation_key_definitions | subelements('lifecycle_environments', skip_missing=True) }}"
+  loop_control:
+    label: "Creando Activation Key {{ item.0.name }} para {{ item.1 }}"
+  vars:
+    env: "{{ item.1 }}"
+    item: "{{ item.0 }}"
+  ignore_errors: true    

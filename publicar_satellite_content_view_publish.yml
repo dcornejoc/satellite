@@ -1,0 +1,27 @@
+---
+- name: Publicando vistas de contenido en Satellite.
+  hosts: localhost
+  gather_facts: false
+  become: false
+  collections:
+    - redhat.satellite
+  tasks:
+    - name: Publicando vista de contenido en Satellite en la organizacion {{ satellite_organization }}.
+      when:
+        - satellite_cv_action == "Publicar"
+      redhat.satellite.content_view_version:
+        content_view: "{{ satellite_cv_name }}"
+        organization: "{{ satellite_organization }}"
+        version: "{{ satellite_cv_version | default(omit) }}"
+        lifecycle_environments: "{{ satellite_cv_lifecycle_environments | default(omit) }}"
+        state: present
+
+    - name: Borrando vista de contenido en Satellite en la organizacion {{ satellite_organization }}.
+      when:
+        - satellite_cv_action == "Borrar"
+      redhat.satellite.content_view_version:
+        content_view: "{{ satellite_cv_name }}"
+        organization: "{{ satellite_organization }}"
+        version: "{{ satellite_cv_version | default(omit) }}"
+        state: absent
+...

@@ -1,0 +1,7 @@
+- name: Crear o modificar organizaciones en Satellite.
+  delegate_to: localhost
+  redhat.satellite.organization:
+    name: "{{ satellite_organization }}"
+    description: "{{ satellite_organization_descr | default(omit) }}"
+    state: present
+    

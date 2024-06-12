@@ -1,0 +1,19 @@
+---
+- name: Gestion de lifecycle_environment en Satellite.
+  hosts: localhost
+  gather_facts: false
+  become: false
+  collections:
+    - redhat.satellite
+  tasks:
+    - name: Crear lifecycle_environment en Satellite.
+      when:
+        - satellite_lifecycle_state == "crear"
+      redhat.satellite.lifecycle_environment:
+        name: "{{ lifecycle_environment_name }}"
+        label: "{{ lifecycle_environment_name }}"
+        organization: "{{ satellite_organization }}"
+        prior: "{{ lifecycle_environment_prior }}"
+        description: "{{ lifecycle_environment_description | default(omit) }}"
+        state: present
+...

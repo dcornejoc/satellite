@@ -1,0 +1,29 @@
+---
+- name: Gestion de repositorios individuales en Satellite.
+  hosts: localhost
+  gather_facts: false
+  collections:
+    - redhat.satellite
+  tasks:
+    - name: Habilitando repositorio en organizacion {{ satellite_organization }}.
+      when:
+        - satellite_repository_action == "Habilitar"
+      redhat.satellite.repository_set:
+        organization: "{{ satellite_organization }}"
+        label: "{{ repository_label }}"
+        state: enabled
+        repositories:
+          - releasever: "{{ repository_releasever | default(omit) }}"
+            basearch: "{{ repository_basearch | default(omit) }}"
+
+    - name: Deshabilitando repositorio en organizacion {{ satellite_organization }}.
+      when:
+        - satellite_repository_action == "Deshabilitar"
+      redhat.satellite.repository_set:
+        organization: "{{ satellite_organization }}"
+        label: "{{ repository_label }}"
+        state: disabled
+        repositories:
+          - releasever: "{{ repository_releasever | default(omit) }}"
+            basearch: "{{ repository_basearch | default(omit) }}"
+...

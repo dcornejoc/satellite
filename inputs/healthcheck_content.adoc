@@ -1,0 +1,14 @@
+include::variables.txt[]
+= Healthcheck Openshift 3.11: preparado para - Banco Pichincha
+:title-page-background-image: image:EngagementJournalCoverPageLogoNew.png[fit=contain,position=top]
+:page-background-image: image:EngagementJournalCoverPageLogoNew2.png[fit=contain,position=top]
+
+:toc:
+ifdef::backend-pdf[]
+:pygments-style: tango
+:source-highlighter: pygments
+endif::[]
+
+include::prefacio.adoc[]
+include::salidas_nodes.adoc[]
+include::salidas_satellite.adoc[]

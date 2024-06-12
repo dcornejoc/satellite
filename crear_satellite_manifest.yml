@@ -1,0 +1,33 @@
+---
+- name: Gestion de manifiestos en Satellite.
+  hosts: localhost
+  gather_facts: false
+  vars:
+    satellite_manifest_path: "~/manifest.zip"
+  collections:
+    - redhat.satellite
+  tasks:
+    - name: Descargar manifiesto desde Red Hat Customer Portal.
+      redhat.satellite.redhat_manifest:
+        uuid: "{{ satellite_manifest_uuid }}"
+        username: "{{ satellite_rhsm_username }}"
+        password: "{{ satellite_rhsm_password }}"
+        path: "{{ satellite_manifest_path }}"
+      when: satellite_manifest_action != "borrar"
+
+    - name: Cargar Subscription Manifest a la organizacion {{ satellite_organization }}.
+      when:
+        - satellite_manifest_action == "cargar"
+      redhat.satellite.subscription_manifest:
+        organization: "{{ satellite_organization }}"
+        manifest_path: "{{ satellite_manifest_path }}"
+        state: present
+
+    - name: Borrar Subscription Manifest a la organizacion {{ satellite_organization }}.
+      when:
+        - satellite_manifest_action == "borrar"
+      redhat.satellite.subscription_manifest:
+        organization: "{{ satellite_organization }}"
+        manifest_path: "{{ satellite_manifest_path }}"
+        state: absent
+...

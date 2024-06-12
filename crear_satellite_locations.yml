@@ -1,0 +1,30 @@
+---
+- name: Gestion de ubicaciones en Satellite.
+  hosts: localhost
+  gather_facts: false
+  become: false
+  collections:
+    - redhat.satellite
+  tasks:
+    - name: Crear o actualizar ubicaciones en la organizacion {{ satellite_organization }}.
+      when:
+        - satellite_loc_action == "crear"
+      redhat.satellite.location:
+        organizations: "{{ satellite_organization }}"
+        name: "{{ item }}"
+        state: present
+      loop: "{{ satellite_location_name | split('\n') }}"
+      loop_control:
+        label: "Creando ubicación {{ item }} en la organización {{ satellite_organization }}"
+
+    - name: Borrar ubicaciones en la organizacion {{ satellite_organization }}.
+      when:
+        - satellite_loc_action == "borrar"
+      redhat.satellite.location:
+        organizations: "{{ satellite_organization }}"
+        name: "{{ item }}"
+        state: absent
+      loop: "{{ satellite_location_name | split('\n') }}"
+      loop_control:
+        label: "Borrando ubicación {{ item }} en la organización {{ satellite_organization }}"
+...

@@ -1,0 +1,11 @@
+---
+- name: Habilitar repositorios
+  delegate_to: localhost
+  redhat.satellite.repository_set:
+    organization: "{{ satellite_organization }}"
+    name: "{{ item.Name }}"
+    product: "{{ item.Product }}"
+    state: enabled
+    all_repositories: true
+  loop: "{{ repos }}"
+  ignore_errors: true

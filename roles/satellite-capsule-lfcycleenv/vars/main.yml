@@ -1,0 +1,3 @@
+---
+capsule_fqdn: "{{ capsule_fqdn | default([]) }}"
+lifecycle_environments: "{{ lifecycle_environments | default({}) }}"

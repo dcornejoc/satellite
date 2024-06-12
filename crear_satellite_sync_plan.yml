@@ -1,0 +1,57 @@
+---
+- name: Creando planes de sincronizacion de repositorios en servidor Satellite.
+  hosts: localhost
+  collections:
+    - redhat.satellite
+  tasks:
+    - name: Crear plan de sincronizacion en Satellite Server usando intervalos de tiempo.
+      when:
+        - satellite_sync_interval != "custom cron"
+        - satellite_sync_action == "crear"
+      redhat.satellite.sync_plan:
+        name: "{{ satellite_sync_name }}"
+        organization: "{{ satellite_organization }}"
+        interval: "{{ satellite_sync_interval }}"
+        sync_date: "{{ ansible_facts['date_time']['date'] }} {{ ansible_facts['date_time']['time'] }} {{ ansible_facts['date_time']['tz'] }}"
+        products: "{{ item }}"
+        enabled: True
+        state: present
+      loop: "{{ satellite_sync_products | split('\n') }}"
+    
+    - name: Crear plan de sincronizacion en Satellite Server usando intervalos de tiempo personalizado.
+      when:
+        - satellite_sync_interval == "custom cron"
+        - satellite_sync_action == "crear"
+      redhat.satellite.sync_plan:
+        name: "{{ satellite_sync_name }}"
+        organization: "{{ satellite_organization }}"
+        interval: "{{ satellite_sync_interval }}"
+        cron_expression: "{{ satellite_sync_cron | default(omit) }}"
+        sync_date: "{{ satellite_sync_date | default(omit) }}"
+        products: "{{ item }}"
+        enabled: True
+        state: present
+      loop: "{{ satellite_sync_products | split('\n') }}"
+    
+    - name: Deshabilitar plan de sincronizacion en Satellite Server.
+      when:
+        - satellite_sync_interval != "custom cron"
+        - satellite_sync_action == "deshabilitar"
+      redhat.satellite.sync_plan:
+        name: "{{ satellite_sync_name }}"
+        organization: "{{ satellite_organization }}"
+        interval: "{{ satellite_sync_interval }}"
+        sync_date: "{{ satellite_sync_date | default(omit) }}"
+        enabled: False
+    
+    - name: Deshabilitar plan de sincronizacion en Satellite Server usando intervalos de timepo personalizado.
+      when:
+        - satellite_sync_interval == "custom cron"
+        - satellite_sync_action == "deshabilitar"
+      redhat.satellite.sync_plan:
+        name: "{{ satellite_sync_name }}"
+        organization: "{{ satellite_organization }}"
+        interval: "{{ satellite_sync_interval }}"
+        sync_date: "{{ satellite_sync_date | default(omit) }}"
+        enabled: False
+...

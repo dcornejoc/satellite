@@ -1,0 +1,31 @@
+
+####################################################
+#        Informacion basica del healthcheck        #
+####################################################
+
+rh_staff:
+- {name: "Fernando Valenzuela", role: "Consultant", email: "fvalenzu@redhat.com" }
+- {name: "Ingrid Bohorquez", role: "Project Manager", email: "ibohorq@redhat.com" }
+- {name: "Ariana Escobar", role: "Consultant", email: "aescobar@redhat.com" }
+
+customer_staff:
+- {name: "Xavier Cajas", role: "Arquitecto UNIX", email: "xavcjas@pichincha.com" }
+
+rhs_version: 6.15
+rhs_customer_subject: "Healthcheck Red Hat Satellite 6.15"
+rhs_customer: "Banco Pichincha"
+ocp_document_version: 1.0.1
+fecha_ejecucion: "{{ ansible_date_time.date }}_{{ ansible_date_time.hour }}{{ ansible_date_time.minute }}"
+fecha: "{{ ansible_date_time.date }}"
+
+problemas_servidor_encontrados: false
+problemas_capsulas_encontrados: false
+
+umbral_limite: 3
+
+send_email: true
+smtp_host: 10.70.64.60
+smtp_port: 25
+mail_from: "ansibleProd@pichincha.com"
+mail_to: "areescob@pichincha.com"
+mail_subject: "Reporte Ansible PROD | Health Check Satellite | JobID {{ tower_job_id }}"
